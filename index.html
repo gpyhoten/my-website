@@ -1,3 +1,4 @@
+
 <html >
 
 <head>
@@ -8,18 +9,16 @@
     .table-area-head
     {
       background-color:#33CCFF;
-      height:4vh;
     }
     .table-area-head table
     {
       border-collapse: collapse;
       width:100%;
-      height:4vh;
     }
     .table-area-head table th
     {
       border:3px solid black;
-      font-size: 25px;
+      font-size: 1.5vh;
       font-style: none;
       text-align:center;
       vertical-align:middle;
@@ -166,6 +165,28 @@
       }, duration);
     }
 
+    //判断移动端
+    function IsPC(){    
+     var userAgentInfo = navigator.userAgent;  
+     var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");    
+     var flag = true;    
+     for (var v = 0; v < Agents.length; v++) {    
+         if (userAgentInfo.indexOf(Agents[v]) > 0) { flag = false; break; }    
+     }    
+     return flag;    
+ 	}  
+
+    window.onload=function(){
+    	if(IsPC()){
+    		document.getElementById("myATA").style.height = "10vh";
+    		document.getElementById("myCAT").style.height = "10vh";
+    		document.getElementById("titleSearch").style.height = "10vh";
+    		document.getElementById("confirmBtn").style.height = "10vh";
+    		document.getElementById("biaogezhuti").style.height = "85vh";
+
+    	}
+	} 
+
   </script>
 </head>
 
@@ -174,8 +195,8 @@
 
 
 <div>
-  <div style="width: 100vw;height: 5.3vh;vertical-align:baseline; display:inline; ">  
-      <select id="myATA" name="zhangjie" style="border:2px solid;border-radius:25px;font-size: 30;width: 30vw;height: 5vh;text-align: center;background-color: #33CCFF">
+  <div style="width: 100vw;height: 5.3vh;vertical-align:baseline; display:inline; ">
+      <select id="myATA" name="zhangjie" style="margin-right: 1vw;25px;float:left;border:2px solid;border-radius:25px;font-size: 1.7vh;width: 30vw;height: 5vh;text-align: center;background-color: #33CCFF;">
         <option value="a0">ATA筛选-全部</option>
         <option value="aa">A.特殊运行</option>
         <option value="ab">B.Boeing网站</option>
@@ -243,7 +264,7 @@
         <option value="cl">72-00 发动机</option>
         <option value="cm">78-34 反推</option>
       </select>
-      <select id="myCAT" name="leixing" multiple="multiple" style="border:2px solid;border-radius:25px;font-size: 30;width: 30vw;height: 5vh;text-align: center;background-color: #33CCFF">
+      <select id="myCAT" name="leixing" multiple="multiple" style="margin-right: 1vw;float:left;border:2px solid;border-radius:25px;font-size: 1.7vh;width: 30vw;height: 5vh;text-align: center;background-color: #33CCFF">
         <option>1.1故障分享</option>
         <option>1.2故障处置</option>
         <option>1.3故障分析</option>
@@ -258,9 +279,9 @@
         <option>8.2力矩查询</option>
         <option>8.3标准查询</option>
       </select>
-    <input type="text" id="titleSearch" placeholder="标题搜索" oninput="limateTpye()" style="border:2px solid;border-radius:25px;font-size: 30;width: 20vw;height: 5vh;vertical-align:top;text-align: center;">
+    <input type="text" id="titleSearch" placeholder="标题搜索" oninput="limateTpye()" style="margin-right: 1vw;float:left;border:2px solid;border-radius:25px;font-size: 1.7vh;width: 20vw;height: 5vh;vertical-align:top;text-align: center;">
 
-    <button onclick="clickme()" style="border:2px solid;border-radius:25px;font-size: 30;width: 15vw;height: 5vh;vertical-align:top;text-align: center;">执行筛选</button>
+    <button onclick="clickme()" id="confirmBtn"  style="float:left;border:2px solid;border-radius:25px;font-size: 1.7vh;width: 15vw;height: 5vh;vertical-align:top;text-align: center;">执行筛选</button>
 </div>
 
 
@@ -278,7 +299,7 @@
     </table>
   </div>
 
-  <div class = "table-area-body">
+  <div id="biaogezhuti" class = "table-area-body">
     <table id="mytable">
      <col width=4%/>
      <col width=8%/>
@@ -3189,6 +3210,14 @@
       <div id=updatedTime>更新日期：2021年11月15日</div>
   </div>
 </div>
+
+
+
+
+
+
+
+
 
 
 
