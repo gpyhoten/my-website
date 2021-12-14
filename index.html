@@ -238,11 +238,11 @@
     		document.getElementById("titleSearch").value = searchKeyWord;
     		document.getElementById("checkBoxjiZhu").checked = true;
     		var myCAToptions = document.getElementById("myCAT").options;
-        for(i=0;i<myCATFlag.length;i++){
-          //生成类别短字符串，提高效率
-          myCAToptions[i].selected = myCATFlag.charAt(i)=="1"?true:false;
-        }
-
+	        for(i=0;i<myCATFlag.length;i++){
+	          //生成类别短字符串，提高效率
+	          myCAToptions[i].selected = myCATFlag.charAt(i)=="1"?true:false;
+	        }
+	    }
 
 
 	} 
