@@ -81,11 +81,14 @@
   </style>
 
   <script type="text/javascript">
+  	var historyVisit=[-1,-1,-1];
+  	var historyVisitIndex = 0;
     var counter = 0;
     var leibie = ["aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am","an","ao","ap","aq","ar","as","at","au","av","aw","ax","ay","az","ba","bb","bc","bd","be","bf","bg","bh","bi","bj","bk","bl","bm","bn","bo","bp","bq","br","bs","bt","bu","bv","bw","bx","by","bz","ca","cb","cc","cd","ce","cf","cg","ch","ci","cj","ck","cl","cm"];
     var myCatCode = ["la","lb","lc","ld","le","lf","lg","lh","li","lj","lk","ll","lm"];
 
     function clickme(){
+
         var x=document.getElementById("myATA").selectedIndex;
         var y=document.getElementById("myATA").options;
         var searchKeyWord = document.getElementById("titleSearch").value;
@@ -95,15 +98,10 @@
         var myCAToptions = document.getElementById("myCAT").options;
         var jiZhuFlag = document.getElementById("checkBoxjiZhu").checked;
         var myCATStr = "";
-        var myCATFlag = "";
         for(i=0;i<myCAToptions.length;i++){
           //生成类别短字符串，提高效率
           if(myCAToptions[i].selected == true){
             myCATStr = myCATStr + myCatCode[i]+" ";
-            myCATFlag = myCATFlag + "1";
-          }
-          else{
-            myCATFlag = myCATFlag + "0";
           }
         }
 
@@ -142,37 +140,98 @@
         }
         Toast("完成筛选，共 "+counter+" 条",3000);
         counter = 0;
+        logCookie();
+
+	        var myCookies = getCookie("ataIndex") + getCookie("myCATFlag") + getCookie("searchKeyWord") ;
+	        console.log("当前的cookie:");
+	        console.log(document.cookie);
+    }
+
+    function logCookie(){
+    	var x=document.getElementById("myATA").selectedIndex;
+        var myCAToptions = document.getElementById("myCAT").options;
+        var searchKeyWord = document.getElementById("titleSearch").value;
+        var jiZhuFlag = document.getElementById("checkBoxjiZhu").checked;
+        var myCATFlag = "";
+        for(i=0;i<myCAToptions.length;i++){
+          if(myCAToptions[i].selected == true){
+            myCATFlag = myCATFlag + "1";
+          }
+          else{
+            myCATFlag = myCATFlag + "0";
+          }
+        }
 
         if(jiZhuFlag==true){
 	        setCookie("ataIndex",x,30);
 	        setCookie("myCATFlag",myCATFlag,30);
 	        setCookie("searchKeyWord",searchKeyWord,30);
-	        setCookie("jiZhuFlag",jiZhuFlag,30);
-
+	        setCookie("jiZhuFlag","true",30);
         }
         else{
 	        setCookie("ataIndex",0,30);
 	        setCookie("myCATFlag","0000000000000",30);
-
-	        var myCAToptions = document.getElementById("myCAT").options;
-    		myCATlength = myCATFlag.length;
-	        for(i=0;i<myCATFlag.length;i++){
-	          //生成类别短字符串，提高效率
-	          myCAToptions[i].selected = myCATFlag.charAt(i)=="1"?true:false;
-	        }
-
-
 	        setCookie("searchKeyWord","",30);
-	        setCookie("jiZhuFlag",false,30);
-
+	        setCookie("jiZhuFlag","false",30);
         }
 
 
 	        var myCookies = getCookie("ataIndex") + getCookie("myCATFlag") + getCookie("searchKeyWord") ;
+	        console.log("当前的cookie:");
 	        console.log(document.cookie);
     }
 
+    function doclick() {
 
+        var thisRowNumber = event.srcElement.parentElement.rowIndex; // 通过event.srcElement 获取激活事件的对象 td 
+        //var thisRowNumber = event.srcElement.parentElement.parentElement.rowIndex; // 通过event.srcElement 获取激活事件的对象 td 
+
+        //alert("thisRowNumber: " + (thisRowNumber));
+
+
+        //判断是否为最近访问，若是则跳过
+        for(i=0;i<3;i++){
+        	if(historyVisit[i]==thisRowNumber){
+        		return;
+        	}
+        }
+
+        //标记
+		var newNode = document.createTextNode(" ☜☜☜");
+		//newNode.font-style.color = #ff8040;
+
+        event.srcElement.parentElement.appendChild(newNode);
+        historyVisit[2]=historyVisit[1];
+        historyVisit[1]=historyVisit[0];
+        historyVisit[0]=thisRowNumber;
+
+/*
+            var board = document.getElementById("board");
+            var e = document.createElement("input");
+            e.type = "button";
+            e.value = "这是测试加载的小例子";
+            var object = board.appendChild(e);
+*/
+
+	  	//var historyVisit[-1,-1,-1];
+	  	//var historyVisitIndex = 0;
+
+
+
+
+/*
+        var td = event.srcElement; // 通过event.srcElement 获取激活事件的对象 td 
+
+        alert("行号：" + (td.parentElement.rowIndex + 1) + "，内容：" + td.innerText);
+        var tab = document.getElementById("mytable");
+        //表格行数
+        var rows = tab.rows.length;
+        //表格列数
+        var cells = tab.rows.item(0).cells.length;
+        alert("行数" + rows + "列数" + cells);
+*/
+
+    }
     //限制输入空格
     function limateTpye(){
       var Oldstr = document.getElementById("titleSearch").value.replace(" ","").toUpperCase();
@@ -242,8 +301,25 @@
     		document.getElementById("biaogezhuti").style.height = "85vh";
     	}
 
+    	//给超链接绑定事件
+    	var myAnchors = document.getElementsByTagName("a");
+    	//var myAnchors = document.getElementById("mytable").getElementsByClassName("title");
+    	for(i=0;i<myAnchors.length;i++){
+    		myAnchors[i].onclick = doclick;
+    	}
+
+    	console.log(myAnchors);
+
+
+
+
+	        var myCookies = getCookie("ataIndex") + getCookie("myCATFlag") + getCookie("searchKeyWord") ;
+	        console.log("当前的cookie:");
+	        console.log(document.cookie);
+
+
     	var jiZhuFlag = getCookie("jiZhuFlag");
-        if(jiZhuFlag== true){
+        if(jiZhuFlag== "true"){
     		document.getElementById("checkBoxjiZhu").checked = true;
 
 	    	var ataIndex = getCookie("ataIndex");
@@ -256,8 +332,9 @@
     		var myCAToptions = document.getElementById("myCAT").options;
 	        for(i=0;i<myCATFlag.length;i++){
 	          //生成类别短字符串，提高效率
-	          myCAToptions[i].selected = myCATFlag.charAt(myCATlength-1-i)=="1"?true:false;
+	          myCAToptions[i].selected = myCATFlag.charAt(i)=="1"?true:false;
 	        }
+	        justSetCookieFlag = true;
 	        clickme();
 	    }
 
@@ -358,7 +435,7 @@
     <input type="text" id="titleSearch" placeholder="标题搜索" oninput="limateTpye()" style="margin-right: 1vw;float:left;border:2px solid;border-radius:25px;font-size: 2.7vw;width: 20vw;height: 5vh;vertical-align:top;text-align: center;">
 
     <button onclick="clickme()" id="confirmBtn"  style="margin-right: 1vw;border:2px solid;border-radius:25px;font-size: 2.7vw;width: 15vw;height: 5vh;vertical-align:top;text-align: center;">执行筛选</button>
-    <label style="border:2px solid;border-radius:25px;font-size: 4vw;width: 11vw;height: 5vh;vertical-align:middle;word-break:break-all;word-wrap:break-all;background-color:#33CCFF;"><input type="checkbox"  onchange="clickme()" id="checkBoxjiZhu" style="width: 4vw; height: 5vh;" ></input>记住</label>
+    <label style="border:2px solid;border-radius:25px;font-size: 4vw;width: 11vw;height: 5vh;vertical-align:middle;word-break:break-all;word-wrap:break-all;background-color:#33CCFF;"><input type="checkbox"  onchange="logCookie()" id="checkBoxjiZhu" style="width: 4vw; height: 5vh;" ></input>记住</label>
 </div>
 
 
@@ -384,7 +461,7 @@
 	    <col width=8%/>
 	    <col width=64%/>
 	    <col width=8%/>
-		<tr name="aa" class="lf"><td>1</td><td>3系飞行员</td><td>2019/7/15</td><td>A.特殊运行</td><td class="title"><a href="https://mp.weixin.qq.com/s/-rDmp32OZBzJ0g2_tZBrRA">【科普知识】PBN发展史</a></td><td>3.知识分享</td></tr>
+		<tr name="aa" class="lf" id="testr"><td>1</td><td>3系飞行员</td><td>2019/7/15</td><td>A.特殊运行</td><td class="title"><a href="https://mp.weixin.qq.com/s/-rDmp32OZBzJ0g2_tZBrRA">【科普知识】PBN发展史</a></td><td>3.知识分享</td></tr>
 		<tr name="bx" class="lf"><td>2</td><td>3系飞行员</td><td>2019/7/17</td><td>34-53 ATC</td><td class="title"><a href="https://mp.weixin.qq.com/s/Gz_Xx_Acqrw8uLIlkHb0Hw">【科普知识】ADS-B</a></td><td>3.知识分享</td></tr>
 		<tr name="aa" class="lf"><td>3</td><td>3系飞行员</td><td>2019/7/30</td><td>A.特殊运行</td><td class="title"><a href="https://mp.weixin.qq.com/s/K_QgCWCAMdRgQduHpAi2lw">【科普知识】ETOPS发展史</a></td><td>3.知识分享</td></tr>
 		<tr name="bs" class="lf"><td>4</td><td>3系飞行员</td><td>2019/10/9</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/MHEA45u81_-ec4Zze-EPdQ">【科普知识】GPS</a></td><td>3.知识分享</td></tr>
@@ -3300,679 +3377,3 @@
 
 
 </html>
-" class="la"><td>2425</td><td>学刚说</td><td>2018/7/25</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/kvrz6cU3-LEZ3u1c5f-h4A">说说737NG 显示X-BLD 信息</a></td><td>1.1故障分享</td></tr>
-		<tr name="am" class="lm"><td>2426</td><td>学刚说</td><td>2018/7/27</td><td>05-51-19 雷击</td><td class="title"><a href="https://mp.weixin.qq.com/s/vS3HSBFKbs2L7vWvznM7Yw">说说雷击损伤的标准</a></td><td>8.3标准查询</td></tr>
-		<tr name="bl" class="lf"><td>2427</td><td>学刚说</td><td>2018/7/31</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/oIYFc34B_fLrHAR5EQCW1g">说说飞机的轮胎航线检查</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2428</td><td>学刚说</td><td>2018/8/5</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/d2cr8hkzGxzh-Ql5aBAhPA">航材件号相关的冷知识</a></td><td>3.知识分享</td></tr>
-		<tr name="bi" class="lh"><td>2429</td><td>学刚说</td><td>2018/8/6</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/qOx_hjkoCqLFaD8CWewF4Q">737风挡加温故障维护提示</a></td><td>5.维护提示</td></tr>
-		<tr name="aj" class="lf"><td>2430</td><td>学刚说</td><td>2018/8/9</td><td>05-51 条件检查</td><td class="title"><a href="https://mp.weixin.qq.com/s/j7pJZMM1cjgR2NTTrC5dTg">关于硬着陆的一些解释及澄清</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2431</td><td>学刚说</td><td>2018/8/12</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/FEKy5SM1FlEh25A7eueOJA">737 发动机尾喷管下部滑油积聚</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lf"><td>2432</td><td>学刚说</td><td>2018/8/14</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/tOslqQqA6ibrnFDpW2o4oQ">说说737飞机的液压油液渗漏</a></td><td>3.知识分享</td></tr>
-		<tr name="cc" class="lf"><td>2433</td><td>学刚说</td><td>2018/8/27</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/LFT_8M7RtDLtbeUVEUM5hw">说说厕所水龙头</a></td><td>3.知识分享</td></tr>
-		<tr name="bu" class="lf"><td>2434</td><td>学刚说</td><td>2018/8/29</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/QsGy0ajMK0Vn_9eeuN0xqQ">说说霍尼韦尔RDR 400 气象雷达系统</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2435</td><td>学刚说</td><td>2018/9/8</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/MjffDKFOxYMzqScR2AQBjA">说说737-800飞机的冲压空气系统</a></td><td>3.知识分享</td></tr>
-		<tr name="bj" class="lf"><td>2436</td><td>学刚说</td><td>2018/9/15</td><td>31-00 指示记录</td><td class="title"><a href="https://mp.weixin.qq.com/s/muZ0yuq4XKwOc1Zam4rhdw">说说驾驶舱常见指示灯的维护</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2437</td><td>学刚说</td><td>2018/9/18</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/n1y4tjUx28GecFdltyQt8A">说说飞机上的TUBE、DUCT、MANIFOLD、HOSE</a></td><td>3.知识分享</td></tr>
-		<tr name="cg" class="lf"><td>2438</td><td>学刚说</td><td>2018/10/14</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/sxCgvQN40egf51YRgKWLig">说说航空器结构持续完整性大纲</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="la"><td>2439</td><td>学刚说</td><td>2018/10/16</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/9Zmajyl5KZny8JF4DDGMXg">一则奇怪的737引气故障排故心得</a></td><td>1.1故障分享</td></tr>
-		<tr name="ae" class="lf"><td>2440</td><td>学刚说</td><td>2018/10/20</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/KR7KDon93gcv1ZT6gUrS3Q">从中国民航的大数据说说空客飞机和波音飞机</a></td><td>3.知识分享</td></tr>
-		<tr name="be" class="ld"><td>2441</td><td>学刚说</td><td>2018/10/27</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/1rKvTWP5Ut925LB835QSiw">说说737NG 安装S651 电门时的排线注意事项</a></td><td>1.4经验总结</td></tr>
-		<tr name="cl" class="la"><td>2442</td><td>学刚说</td><td>2018/10/28</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/BvlpcQwzsayi9RRncmoZAw">737NG关车之时滑油压力框瞬间变红</a></td><td>1.1故障分享</td></tr>
-		<tr name="ai" class="lb"><td>2443</td><td>学刚说</td><td>2018/10/30</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/pPwfs_iaY0wy_5xCSlF7sQ">说说737NG飞机冬季常见故障快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="bu" class="le"><td>2444</td><td>学刚说</td><td>2018/11/2</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/yzEkp9t5iwNUGPQh75j5CQ">737NG对于安装不同厂家的雷达收发机操作测试的说明</a></td><td>2.换件测试</td></tr>
-		<tr name="aw" class="lf"><td>2445</td><td>学刚说</td><td>2018/11/12</td><td>26-18 过热探测</td><td class="title"><a href="https://mp.weixin.qq.com/s/TlLvo_jAfgVBNSy6ws0BqA">关于737NG新型部件过热探测组件M237维护提示</a></td><td>3.知识分享</td></tr>
-		<tr name="cj" class="lf"><td>2446</td><td>学刚说</td><td>2018/11/23</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/ne2s61qx-6xG9Iipt2j9vA">说说737风挡使用的封严胶</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2447</td><td>学刚说</td><td>2018/11/24</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/OJn3V3n0WA9nA4Hrzt5EPw">说说CFM56-3 发动机风扇叶片凸台间隙</a></td><td>3.知识分享</td></tr>
-		<tr name="bm" class="lf"><td>2448</td><td>学刚说</td><td>2018/12/1</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/y2sIb-A-cO2K4O8udcQuJg">说说737NG的第三代天空内饰灯光系统</a></td><td>3.知识分享</td></tr>
-		<tr name="au" class="lf"><td>2449</td><td>学刚说</td><td>2018/12/2</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/5hdsrYTcyRtDBWyhKHaFbw">说说737NG登机门滑梯包挂帘</a></td><td>3.知识分享</td></tr>
-		<tr name="cf" class="lf"><td>2450</td><td>学刚说</td><td>2018/12/7</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/yBUpthWUzVl5a0TTGKmLAg">说说737NG飞机APU滑油滤压差弹出指示销的人工复位</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="lf"><td>2451</td><td>学刚说</td><td>2018/12/13</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/JqK4kSZuM_G5xtDE2sg2CQ">737引气系统维护小结</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="lf"><td>2452</td><td>学刚说</td><td>2018/12/14</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/m2aIBZHF8WpIXYBMgfifLA">737引气系统维护小结之二</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="lf"><td>2453</td><td>学刚说</td><td>2018/12/16</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/n7KyDqSxOJ_iFn10XaaeuA">737引气系统维护小结之三</a></td><td>3.知识分享</td></tr>
-		<tr name="cg" class="lf"><td>2454</td><td>学刚说</td><td>2018/12/18</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/UoptB4JZoORL1z1jZtjiWQ">简单说说如何快速对水平安定面前缘的凹坑进行快速准确的定位</a></td><td>3.知识分享</td></tr>
-		<tr name="bj" class="ld"><td>2455</td><td>学刚说</td><td>2018/12/20</td><td>31-00 指示记录</td><td class="title"><a href="https://mp.weixin.qq.com/s/3MmqdJClTI7heqSoErziHQ">737NG FDR OFF灯亮排故提示</a></td><td>1.4经验总结</td></tr>
-		<tr name="cl" class="lh"><td>2456</td><td>学刚说</td><td>2018/12/23</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/cGod9jrrGMNgOhE-S-x5Ig">737CL PMC灯亮维护提示</a></td><td>5.维护提示</td></tr>
-		<tr name="bc" class="ld"><td>2457</td><td>学刚说</td><td>2018/12/24</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/4snxML5HdDARlmOih-0Row">737飞机水平安定面配平故障分析汇总</a></td><td>1.4经验总结</td></tr>
-		<tr name="ai" class="lf"><td>2458</td><td>学刚说</td><td>2018/12/25</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/pjf6Ara7K0LW9-Icf3Muvw">说说飞机的修理和改装</a></td><td>3.知识分享</td></tr>
-		<tr name="ba" class="la"><td>2459</td><td>学刚说</td><td>2018/12/26</td><td>27-31 升降舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/CYNyvoWYlf_TxyUYyPhUjQ">737NG升降舵皮托管过热灯亮排故</a></td><td>1.1故障分享</td></tr>
-		<tr name="ai" class="lf"><td>2460</td><td>学刚说</td><td>2019/1/1</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/bpfamNL_aw7EhqiAxlmr0A">说说部件可靠性的几个数据</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2461</td><td>学刚说</td><td>2019/1/2</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/3cLqY_lx5XxzuGFoJAaC6A">说说737NG飞机的停留刹车灯</a></td><td>3.知识分享</td></tr>
-		<tr name="ae" class="lf"><td>2462</td><td>学刚说</td><td>2019/1/4</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/bf2EjZ9utlFH6qXMU5kNkA">说说飞机的初始适航</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2463</td><td>学刚说</td><td>2019/1/5</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/W8iyhE6eazBKEkne3axZJw">各类天线封胶及GASKET使用提示</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lm"><td>2464</td><td>学刚说</td><td>2019/1/10</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZR2NGngYkoIrh-Wa0gAE4Q">说说737飞机的动封严渗漏检查(PTU)</a></td><td>8.3标准查询</td></tr>
-		<tr name="bd" class="lf"><td>2465</td><td>学刚说</td><td>2019/1/14</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/D6z0n9Gm6FlRUDr8GB0EUA">说说737NG的襟翼位置传感器</a></td><td>3.知识分享</td></tr>
-		<tr name="bm" class="lf"><td>2466</td><td>学刚说</td><td>2019/1/17</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/GrDhVd9M69zVMxggNdHk6w">737NG翼尖频闪灯互换性说明</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2467</td><td>学刚说</td><td>2019/1/20</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/lWT28jujD3CJG_48wawUBA">分享日本民航局防部件脱落的经验</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2468</td><td>学刚说</td><td>2019/1/23</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/XF0ZE7o8WFO4Ix2CQm8M_A">737NG 空调分配系统的思维导图</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2469</td><td>学刚说</td><td>2019/1/27</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/P2fpscV6rRKbEDhT1pKCNA">说说飞机的TCDS中的几个术语</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2470</td><td>学刚说</td><td>2019/1/31</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/6Xf6UrFtIUToKzlsgOU8zA">737NG飞机有意思的冷知识之补充</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2471</td><td>学刚说</td><td>2019/2/11</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/PPRboKYWIBsw4-nOyQQSuQ">说说787 特殊的螺钉</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2472</td><td>学刚说</td><td>2019/2/17</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/6RqmSJVLaoUkuenAEafbCw">说说787 -9 商务舱座椅的小秘密</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2473</td><td>学刚说</td><td>2019/2/21</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/taCDtTeZObI5OXLyhaNK7Q">配平钉构型不一致，需要重新试车吗？</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2474</td><td>学刚说</td><td>2019/2/25</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZnUsngDJ-HYctcEmyd9q_w">简说787的E化系统</a></td><td>3.知识分享</td></tr>
-		<tr name="ae" class="lf"><td>2475</td><td>学刚说</td><td>2019/3/1</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/bvUBNk6dz4OIOvB34Zx5Ig">雇佣兵机务的泪-说说委托与雇佣</a></td><td>3.知识分享</td></tr>
-		<tr name="ad" class="lf"><td>2476</td><td>学刚说</td><td>2019/3/3</td><td>D.SWPM</td><td class="title"><a href="https://mp.weixin.qq.com/s/kNel8-LX6aeM4G5miB2T0Q">说说波音飞机上线束用的绑绳</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2477</td><td>学刚说</td><td>2019/3/7</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZBsY468HP54C9RDwRTQvlw">说说怎样从查尔斯顿接回一架波音787飞机</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="lf"><td>2478</td><td>学刚说</td><td>2019/3/11</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/peer0Xo03k-H5GIpShiiiA">说说关于防静电护腕的一些注意</a></td><td>3.知识分享</td></tr>
-		<tr name="av" class="lc"><td>2479</td><td>学刚说</td><td>2019/3/19</td><td>26-00 防火</td><td class="title"><a href="https://mp.weixin.qq.com/s/svKM20zUnbl-m9Y85idKGA">李工布道之“737NG的APU爆炸帽灯点亮分析”</a></td><td>1.3故障分析</td></tr>
-		<tr name="bh" class="ld"><td>2480</td><td>学刚说</td><td>2019/3/29</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/6rn0aSLxXFa2ogb4aQnX5Q">李工布道之“737飞机液压油箱串油排故指南”</a></td><td>1.4经验总结</td></tr>
-		<tr name="cl" class="lh"><td>2481</td><td>学刚说</td><td>2019/4/1</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/5bmqbkEEprdb8ZGKE-Whcw">老王解惑之“CFM56-3C HPTCC TIMER维护提示”</a></td><td>5.维护提示</td></tr>
-		<tr name="cc" class="lf"><td>2482</td><td>学刚说</td><td>2019/4/2</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/Boo2bwfy60VryKVKHsep_A">老王解惑之“737NG 真空排污系统排故提示”</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2483</td><td>学刚说</td><td>2019/4/8</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/H1q0g6cU1xTaMpPJt8mEEg">老王解惑之“CFM56-7B起动故障简易判断”</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lm"><td>2484</td><td>学刚说</td><td>2019/4/10</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/1igu49BLUlRIFJ_d5Bx5LQ">老王解惑之“CFM56-3 OGV检查标准及构型提示”</a></td><td>8.3标准查询</td></tr>
-		<tr name="ch" class="le"><td>2485</td><td>学刚说</td><td>2019/4/16</td><td>52-00 门</td><td class="title"><a href="https://mp.weixin.qq.com/s/XYMGSMRQLyp6RE_HsT7cBQ">说说737NG前登机门阵风锁销子小螺钉的安装</a></td><td>2.换件测试</td></tr>
-		<tr name="bs" class="lf"><td>2486</td><td>学刚说</td><td>2019/4/17</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/rzo5TgHmXLS3KmC_1sHyZg">说说“GPS周数翻转”</a></td><td>3.知识分享</td></tr>
-		<tr name="cg" class="lf"><td>2487</td><td>学刚说</td><td>2019/4/19</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/xpQJiN5NKPYEWqHr8ympPw">说说“RDR和8100-9”</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2488</td><td>学刚说</td><td>2019/4/24</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Vb8jW3UIOl1etuuov0jvig">培工说“CFM56-7B 减推力起飞的经济性分析”</a></td><td>3.知识分享</td></tr>
-		<tr name="ba" class="lf"><td>2489</td><td>学刚说</td><td>2019/4/28</td><td>27-31 升降舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/D4k37dsJcp6Ious_rdagQw">老王解惑之“ELEV TAB ANTI-BALANCE MODE INOP”</a></td><td>3.知识分享</td></tr>
-		<tr name="cf" class="le"><td>2490</td><td>学刚说</td><td>2019/5/3</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/ocot-pbUjwJN6F4ndpwRlg">李工布道之“737NG读取APU故障代码”</a></td><td>2.换件测试</td></tr>
-		<tr name="ai" class="lf"><td>2491</td><td>学刚说</td><td>2019/5/5</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/Hfq_mYonxxxjmZuYLgYztg">说说“如何计算飞机的重心”</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="la"><td>2492</td><td>学刚说</td><td>2019/5/8</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/-PL5VStorIQQo9wf7CPftQ">说说“737NG飞机减摆器漏油”</a></td><td>1.1故障分享</td></tr>
-		<tr name="cj" class="la"><td>2493</td><td>学刚说</td><td>2019/5/13</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/ebAaZjpAf722twG6n12ZGQ">说说风挡的防潮封严/驼峰封严（HUMP SEAL）</a></td><td>1.1故障分享</td></tr>
-		<tr name="bh" class="lf"><td>2494</td><td>学刚说</td><td>2019/5/18</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/h4Q7Skt6Mns8Rh1rU5ozjg">说说“液压软管”</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2495</td><td>学刚说</td><td>2019/5/25</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/qhFC2ihHaCfZtdN2x8NzUQ">说说飞机轮胎那点事</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="lf"><td>2496</td><td>学刚说</td><td>2019/5/28</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/UHvTbx6WQUooFQ7D_6d5og">说说飞机上常用的“防咬剂”</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2497</td><td>学刚说</td><td>2019/6/4</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ginx2eu1Iybc-XaT8928eQ">说说787-9飞机的饮用水盖板的检查注意</a></td><td>3.知识分享</td></tr>
-		<tr name="au" class="lf"><td>2498</td><td>学刚说</td><td>2019/6/9</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/BRbQZgssExCkOJ4ZeaD4bQ">说说“737NG 航后各电门状态”之一</a></td><td>3.知识分享</td></tr>
-		<tr name="au" class="lf"><td>2499</td><td>学刚说</td><td>2019/6/10</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/M7_fCrGqjwKKOvGuxIzA3w">说说“737NG航后电门状态”之二</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2500</td><td>学刚说</td><td>2019/6/18</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/Qo8cgFlskXGshLktdo2NxQ">说说“737-800飞机空调的夏季维护”</a></td><td>3.知识分享</td></tr>
-		<tr name="bs" class="lf"><td>2501</td><td>学刚说</td><td>2019/6/19</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/AfxBYhhL8li0I_CRvn9b8g">说说737NG 的CATIII</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2502</td><td>学刚说</td><td>2019/6/25</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/nuOGziPC-684CQf1cvVEsQ">说说“ADS-B”</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="la"><td>2503</td><td>学刚说</td><td>2019/6/28</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/9TNevKBt6NOrrxB4Z7Oylw">说说“一则奇怪的组件跳开故障”</a></td><td>1.1故障分享</td></tr>
-		<tr name="bu" class="lf"><td>2504</td><td>学刚说</td><td>2019/7/2</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/-oflDKUrf70uSxUY2yz_uQ">关于飞机WXR气象雷达系统，学机型学不到的知识</a></td><td>3.知识分享</td></tr>
-		<tr name="av" class="li"><td>2505</td><td>学刚说</td><td>2019/7/4</td><td>26-00 防火</td><td class="title"><a href="https://mp.weixin.qq.com/s/Fr9ZY6yzg5z68IpVRKM2Kw">李工布道之“发动机火警探测原理和故障分析”</a></td><td>6.总结教程</td></tr>
-		<tr name="ap" class="lf"><td>2506</td><td>学刚说</td><td>2019/7/5</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/NgcBiEenQQmI6hLPGpHDpQ">说说两条容易忽略的标准施工知识</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2507</td><td>学刚说</td><td>2019/7/12</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Jv-VONn-LuM4OXeTyuFQTg">说说787的光纤修理</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2508</td><td>学刚说</td><td>2019/7/14</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/z_uO8K5E-tIijsx8oLU0Tw">校惯导不简单</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2509</td><td>学刚说</td><td>2019/7/27</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/QqW0ctFj45P1mCzUUz6BRA">说说787飞机监造</a></td><td>3.知识分享</td></tr>
-		<tr name="au" class="lf"><td>2510</td><td>学刚说</td><td>2019/7/28</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/LNYiOFhORZDu0MQ6RD2R8w">小标牌不简单</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2511</td><td>学刚说</td><td>2019/8/2</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/yOPce4R26fzN4HPMw2NFPg">787 飞机容易遭雷击吗？</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2512</td><td>学刚说</td><td>2019/8/4</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/aUD2Nv6MTkDkPKfTm407tg">如何从FAA FORM 上得到DTI 分析的信息</a></td><td>3.知识分享</td></tr>
-		<tr name="ab" class="lf"><td>2513</td><td>学刚说</td><td>2019/8/11</td><td>B.Boeing网站</td><td class="title"><a href="https://mp.weixin.qq.com/s/haz6omlhTgfCMmXup3FTSg">说说老龄飞机记录清查里的结构改装记录</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2514</td><td>学刚说</td><td>2019/8/13</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/swa4WKfF5lp-qJoWWKycWQ">737 NG 的SRADA 系统，想说爱你不容易</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2515</td><td>学刚说</td><td>2019/8/18</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/2vYCkXV2TWhV68MsQtt2rw">说说飞机上的隔离棉</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="la"><td>2516</td><td>学刚说</td><td>2019/8/24</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/1BKqLEwRP9hoBZ_VLDYxmg">说说787飞机在爬升时出现“AUTOBRAKE”信息</a></td><td>1.1故障分享</td></tr>
-		<tr name="cj" class="la"><td>2517</td><td>学刚说</td><td>2019/8/29</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/zak5laQYxchoki0vOBNU1g">风挡雨刮也会带来大问题</a></td><td>1.1故障分享</td></tr>
-		<tr name="as" class="lb"><td>2518</td><td>学刚说</td><td>2019/8/31</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/AZsXFUzgSt7E9FyVrF4R8g">固定式ELT 误发射后怎么办？</a></td><td>1.2故障处置</td></tr>
-		<tr name="bl" class="lf"><td>2519</td><td>学刚说</td><td>2019/9/7</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/YBEHg77TU0pVkVQ9vwOCsw">关于737NG 刹车软管的安装提醒</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2520</td><td>学刚说</td><td>2019/9/8</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/HZu_O5xDEUT9qvVATUnilw">说说737 NG 氧气面罩的通信</a></td><td>3.知识分享</td></tr>
-		<tr name="cj" class="ld"><td>2521</td><td>学刚说</td><td>2019/9/17</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/fI8P9XJCxQsMusVJeGPvdw">关于737NG 风挡检查的提示</a></td><td>1.4经验总结</td></tr>
-		<tr name="af" class="lf"><td>2522</td><td>学刚说</td><td>2019/9/20</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/MTv2CHE6LtUGCzC5DqeG2A">关于787飞机客舱空气压缩机的使用注意</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lh"><td>2523</td><td>学刚说</td><td>2019/9/21</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/9WzlPrKHw3wzalrdp6-i5A">7737 NG 发动机驱动液压泵壳体回油滤的安装提示</a></td><td>5.维护提示</td></tr>
-		<tr name="af" class="lg"><td>2524</td><td>学刚说</td><td>2019/9/28</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/WoItoV2h0qPgpM5Lf0t1Fw">787 飞机扰流板失效程序</a></td><td>4.MEL&放行</td></tr>
-		<tr name="cc" class="lc"><td>2525</td><td>学刚说</td><td>2019/10/13</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/VcngKHuqer5H7xHLGYMvPw">说说一起由于马桶不工作导致的返航事件</a></td><td>1.3故障分析</td></tr>
-		<tr name="cg" class="lf"><td>2526</td><td>学刚说</td><td>2019/10/16</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/BHM6fG64eHCbeRSL8WvHJQ">说说737 NG 飞机663站位的PICKLE FORK检查情况</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2527</td><td>学刚说</td><td>2019/10/19</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/kvdjtQRy4eLwZnlYGz2m-w">787 飞机关于清洁GWIV的方法如何选择</a></td><td>3.知识分享</td></tr>
-		<tr name="cg" class="lf"><td>2528</td><td>学刚说</td><td>2019/10/26</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/FpLwAYVHctAfRIyAG7DXIQ">如何向波音提交一份合格的关于结构损伤报告</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2529</td><td>学刚说</td><td>2019/11/7</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/g6z45kY7RYe3ekIaT8oE-Q">波音专家说怎样为旧有修理获取损伤容限数据</a></td><td>3.知识分享</td></tr>
-		<tr name="ad" class="lk"><td>2530</td><td>学刚说</td><td>2019/11/10</td><td>D.SWPM</td><td class="title"><a href="https://mp.weixin.qq.com/s/XeQqdoF-4mIN-eSM_7xHfw">案例学习：如何查找导线的防磨护套</a></td><td>8.1件号查询</td></tr>
-		<tr name="cl" class="lf"><td>2531</td><td>学刚说</td><td>2019/11/20</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/yg_9N0CMkNH6dNV4WBvYAA">说说波音737NG发动机CFM56—7B识别塞</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lk"><td>2532</td><td>学刚说</td><td>2019/11/23</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/c84gaycYyqQqmT0DGYlfzw">如何查找787 飞机的铆钉件号</a></td><td>8.1件号查询</td></tr>
-		<tr name="cc" class="lf"><td>2533</td><td>学刚说</td><td>2019/11/27</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/N7VMhY7MNkBTGqPDBSRTig">说说737-800 真空污水系统的维护注意</a></td><td>3.知识分享</td></tr>
-		<tr name="bv" class="la"><td>2534</td><td>学刚说</td><td>2019/11/28</td><td>34-45 TCAS</td><td class="title"><a href="https://mp.weixin.qq.com/s/8x8JHIIFfk5SRzQ6Lp2wSw">737NG飞机的由于RA锁定导致的TCAS故障</a></td><td>1.1故障分享</td></tr>
-		<tr name="au" class="lf"><td>2535</td><td>学刚说</td><td>2019/11/30</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/jHdljejfDlRwawbmolFblg">说说应急滑梯包电池测试线缆</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2536</td><td>学刚说</td><td>2019/12/8</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/FLPnO4ui9y2sgkTOkCWIJA">说说737-800 飞机的TCV 活门</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lb"><td>2537</td><td>学刚说</td><td>2019/12/17</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/9ZoWQH_EYHIs_hqkuf1lIA">说说737 NG 飞机冬季常见的漏油及处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="cl" class="ld"><td>2538</td><td>学刚说</td><td>2019/12/24</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/nwk672kZNfhrnB_x7lfhpA">CFM56-7 空气涡轮启动机壳体螺栓断裂</a></td><td>1.4经验总结</td></tr>
-		<tr name="cf" class="la"><td>2539</td><td>学刚说</td><td>2019/12/29</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/v-nXY2H8Qgu52_xWUHXRUg">上穷碧落下黄泉，两处茫茫皆不见 ----记5XXX飞机APU无法启动排故过程</a></td><td>1.1故障分享</td></tr>
-		<tr name="ca" class="lf"><td>2540</td><td>学刚说</td><td>2020/1/4</td><td>35-00 氧气</td><td class="title"><a href="https://mp.weixin.qq.com/s/Cfl-NipCzdxDG12hgcgB4w">说说737NG 飞机氧气面板构型的差异</a></td><td>3.知识分享</td></tr>
-		<tr name="bj" class="la"><td>2541</td><td>学刚说</td><td>2020/1/6</td><td>31-00 指示记录</td><td class="title"><a href="https://mp.weixin.qq.com/s/OqQL-TRrraLz_qLISFh-bg">B5XXX飞机上DU黑屏排故总结</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="ld"><td>2542</td><td>学刚说</td><td>2020/1/11</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/wIlWDuvjFCifIdqL5nnRXA">关于CFM56发动机HPT缺陷的孔探经验分享</a></td><td>1.4经验总结</td></tr>
-		<tr name="af" class="le"><td>2543</td><td>学刚说</td><td>2020/1/19</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/rNseEo8vmSH3MjPUi2YkFw">787NGS MDC更换总结</a></td><td>2.换件测试</td></tr>
-		<tr name="bi" class="lf"><td>2544</td><td>学刚说</td><td>2020/2/1</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/BVxVStUJyi-7QgS_0SY_UQ">关于737N飞机发动机防冰活门的一些信息分享</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lf"><td>2545</td><td>学刚说</td><td>2020/2/6</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/wZv78c0zc2KLkzJBtdTeiw">787飞机上光纤电缆的应用</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2546</td><td>学刚说</td><td>2020/2/13</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/NS6es9Zyre1la4wQMpPUDQ">应急定位发射机初探</a></td><td>3.知识分享</td></tr>
-		<tr name="ca" class="ld"><td>2547</td><td>学刚说</td><td>2020/2/16</td><td>35-00 氧气</td><td class="title"><a href="https://mp.weixin.qq.com/s/mjcHifhYOyN09RcxGYVoRw">737NG机组氧气渗漏排故指南</a></td><td>1.4经验总结</td></tr>
-		<tr name="bp" class="lb"><td>2548</td><td>学刚说</td><td>2020/2/24</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/fKoj7YhAuDMIX-EkupWlgg">737NG 惯导漂移</a></td><td>1.2故障处置</td></tr>
-		<tr name="af" class="ld"><td>2549</td><td>学刚说</td><td>2020/2/25</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/J7stfPY6vMm87RM0MkmjXg">787 EPAS系统排故总结</a></td><td>1.4经验总结</td></tr>
-		<tr name="ae" class="lf"><td>2550</td><td>学刚说</td><td>2020/2/27</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/ENBTa12ReBzD-9jTcJgewg">从事故角度浅谈飞机结构设计理念及规章</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="ll"><td>2551</td><td>学刚说</td><td>2020/2/29</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/5Np1CiiXfFRXqfL2lraZ6A">管路力矩的查询</a></td><td>8.2力矩查询</td></tr>
-		<tr name="av" class="lf"><td>2552</td><td>学刚说</td><td>2020/3/4</td><td>26-00 防火</td><td class="title"><a href="https://mp.weixin.qq.com/s/ACXpr7jooJyzDOSmTTXbZQ">火警、过热探测元件的安装注意</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="lf"><td>2553</td><td>学刚说</td><td>2020/3/10</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/MOykInKOk4qpw2r73d8vTQ">波音螺钉头部的标志识别</a></td><td>3.知识分享</td></tr>
-		<tr name="an" class="lf"><td>2554</td><td>学刚说</td><td>2020/3/12</td><td>10-00 停放系留</td><td class="title"><a href="https://mp.weixin.qq.com/s/YOfoxRKLd_ruy6Rv5MYROQ">大风天气飞机停放工作相关参数的计算</a></td><td>3.知识分享</td></tr>
-		<tr name="ch" class="lf"><td>2555</td><td>学刚说</td><td>2020/3/16</td><td>52-00 门</td><td class="title"><a href="https://mp.weixin.qq.com/s/x6UrDQjvRbCkbOtgycAULg">737NG前登机门导向臂螺钉安装注意事项</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="ld"><td>2556</td><td>学刚说</td><td>2020/3/24</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/MNddOGJBe8FJnuH0ZPcu8w">737NG启动手柄不一致代码排故指南</a></td><td>1.4经验总结</td></tr>
-		<tr name="cl" class="lf"><td>2557</td><td>学刚说</td><td>2020/4/4</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/LL8ydxsmhYKfXhcKXA83yg">737CL不同件号AVM之间的差异</a></td><td>3.知识分享</td></tr>
-		<tr name="an" class="lf"><td>2558</td><td>学刚说</td><td>2020/4/20</td><td>10-00 停放系留</td><td class="title"><a href="https://mp.weixin.qq.com/s/XVPSQ1WLQgcpL1vH6rLf0Q">疫情期间737NG飞机的动态封存</a></td><td>3.知识分享</td></tr>
-		<tr name="cg" class="lb"><td>2559</td><td>学刚说</td><td>2020/4/25</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/gbuW_Y1g7lUF2gkTNUH48Q">李工布道之“737前缘缝翼盖板防风蚀带损伤处理”</a></td><td>1.2故障处置</td></tr>
-		<tr name="ay" class="lc"><td>2560</td><td>学刚说</td><td>2020/5/4</td><td>27-11 副翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/-NTOddG4jCUric7t7AeIsA">李工布道之737NG副翼感觉定中组件随动滚轮故障分析</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lf"><td>2561</td><td>学刚说</td><td>2020/5/16</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/qomCtfHdU36RRaMgEeGfDA">说说CFM56-7B 一个新的发动机状态监控参数</a></td><td>3.知识分享</td></tr>
-		<tr name="at" class="lc"><td>2562</td><td>学刚说</td><td>2020/5/19</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/_ZxR9wQLbU54C1ZIAthPIA">李工布道之你真的了解737NG的SOURCE OFF灯吗</a></td><td>1.3故障分析</td></tr>
-		<tr name="cb" class="lg"><td>2563</td><td>学刚说</td><td>2020/5/21</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/6gWeNBV8SU-uOS-TqeSbcQ">73N发动机引气活门锁定在关闭位；MEL36-05-02</a></td><td>4.MEL&放行</td></tr>
-		<tr name="cl" class="lf"><td>2564</td><td>学刚说</td><td>2020/5/22</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Jh_XdRxdmW8tCAF1IDVxjA">737NG的EEC BITE中航段的定义</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2565</td><td>学刚说</td><td>2020/5/29</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/nR102eeO21nlODr4DEhwTA">波音飞机上的开关和指示灯</a></td><td>3.知识分享</td></tr>
-		<tr name="bz" class="lb"><td>2566</td><td>学刚说</td><td>2020/6/1</td><td>34-61 FMCS</td><td class="title"><a href="https://mp.weixin.qq.com/s/e1rvUbjherZBQ63W2vgDPQ">当CDU的按键磨损后，我们怎么办？</a></td><td>1.2故障处置</td></tr>
-		<tr name="as" class="lf"><td>2567</td><td>学刚说</td><td>2020/6/3</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/RqpvLrzq9Q1-vN46jmiYqw">如何使用卫星通信呼叫飞机</a></td><td>3.知识分享</td></tr>
-		<tr name="bj" class="lf"><td>2568</td><td>学刚说</td><td>2020/6/6</td><td>31-00 指示记录</td><td class="title"><a href="https://mp.weixin.qq.com/s/kCkPpAD0030ifRmXLlNcvA">DU上会闪烁的指示灯</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lf"><td>2569</td><td>学刚说</td><td>2020/6/9</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/2wm629A9DoOn677tT8bRYQ">一种特殊的继电器---GFI继电器 拷贝</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2570</td><td>学刚说</td><td>2020/6/10</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/u5cnK8HckTpq1lDpf0uKxw">发动机孔探常见缺陷的定义和汇总</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lh"><td>2571</td><td>学刚说</td><td>2020/6/16</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/uObybq8XCQ63FtipKCL0lA">737 NG飞机的PTT电门接线端连接注意</a></td><td>5.维护提示</td></tr>
-		<tr name="cl" class="lf"><td>2572</td><td>学刚说</td><td>2020/6/24</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/gg9QkkBehFP2wv61AaOZag">CFM56-7B 发动机风扇叶片楔形榫头UT的仪器校准及防误判经验</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="ld"><td>2573</td><td>学刚说</td><td>2020/6/26</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/PHg2HbXFpd8gMA06yOHfHw">787 PECS散热器排故及拆装</a></td><td>1.4经验总结</td></tr>
-		<tr name="ap" class="lf"><td>2574</td><td>学刚说</td><td>2020/7/4</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/QjlrHkDo74E9cEOC_SFZtQ">拉铆的简单介绍</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="le"><td>2575</td><td>学刚说</td><td>2020/7/7</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/HD11nesx-eNNfe9jJvfiZg">说说737飞机皮托管及静压系统的吹除工作</a></td><td>2.换件测试</td></tr>
-		<tr name="ai" class="lh"><td>2576</td><td>学刚说</td><td>2020/7/14</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/o60FCILDd_Zf9FrYOPoFhg">航线防差错之737NG易装错的部件</a></td><td>5.维护提示</td></tr>
-		<tr name="ba" class="lf"><td>2577</td><td>学刚说</td><td>2020/7/20</td><td>27-31 升降舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZuVLxThikek_63DRxdv5ng">关于737-CL 升降舵调整片检查</a></td><td>3.知识分享</td></tr>
-		<tr name="bj" class="lf"><td>2578</td><td>学刚说</td><td>2020/8/2</td><td>31-00 指示记录</td><td class="title"><a href="https://mp.weixin.qq.com/s/l_GYAidG_OecJncsEhEoLA">关于737CL EFIS控制面板构型的提示</a></td><td>3.知识分享</td></tr>
-		<tr name="bw" class="lb"><td>2579</td><td>学刚说</td><td>2020/8/4</td><td>34-46 EGPWS</td><td class="title"><a href="https://mp.weixin.qq.com/s/agmdx6ku-y7s0aZ87nCUgw">关于我司CL飞机EGPWS增强功能说明及放行处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="as" class="ld"><td>2580</td><td>学刚说</td><td>2020/8/5</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/kaazb5ec71LxXcfeqHXyBw">737NG旅客呼叫灯的设置</a></td><td>1.4经验总结</td></tr>
-		<tr name="bs" class="le"><td>2581</td><td>学刚说</td><td>2020/8/17</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/7W5ZJY6HQPRx7AGCWEiAnA">EGPWS GPS 天线同轴电缆插头更换总结（737CL）</a></td><td>2.换件测试</td></tr>
-		<tr name="bf" class="ld"><td>2582</td><td>学刚说</td><td>2020/8/18</td><td>27-81 前缘襟翼缝翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/GRnEkDJGw-xc6b7iGM8oSA">737CL前缘过渡灯亮处理指南</a></td><td>1.4经验总结</td></tr>
-		<tr name="ca" class="lf"><td>2583</td><td>学刚说</td><td>2020/8/20</td><td>35-00 氧气</td><td class="title"><a href="https://mp.weixin.qq.com/s/UxelN_19H2MRSj-bzxblRA">氧气面罩测试注意事项</a></td><td>3.知识分享</td></tr>
-		<tr name="ba" class="la"><td>2584</td><td>学刚说</td><td>2020/8/24</td><td>27-31 升降舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/KybT0xDNCXtSX4DePA719A">一次NG皮托管加温灯亮排故总结</a></td><td>1.1故障分享</td></tr>
-		<tr name="ch" class="lf"><td>2585</td><td>学刚说</td><td>2020/8/25</td><td>52-00 门</td><td class="title"><a href="https://mp.weixin.qq.com/s/cEXtdA9bMaCNKCxiG1Rx-A">从一起增压故障来比较空客和波音飞机的舱门封严介绍</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="le"><td>2586</td><td>学刚说</td><td>2020/9/2</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/7ie0jIQ3I5Ju1ZoUKDO4wQ">737NG EMDP 更换简介</a></td><td>2.换件测试</td></tr>
-		<tr name="cb" class="lc"><td>2587</td><td>学刚说</td><td>2020/9/6</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/QN2MnxJeUgiD_YqXeGi28A">737NG发动机引气温度高排故</a></td><td>1.3故障分析</td></tr>
-		<tr name="bl" class="lf"><td>2588</td><td>学刚说</td><td>2020/9/7</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/8MHtSOQu9R7kDbQyupuaHg">737飞机临近电门互换性说明</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2589</td><td>学刚说</td><td>2020/9/8</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/C25YAw_4eIcGwzNTXRK7AA">737CL 起落架收放指示逻辑</a></td><td>3.知识分享</td></tr>
-		<tr name="bj" class="lf"><td>2590</td><td>学刚说</td><td>2020/9/14</td><td>31-00 指示记录</td><td class="title"><a href="https://mp.weixin.qq.com/s/dLmMcWS0Rrj-avU6bnUqxw">737CL 马赫空速表故障旗说明</a></td><td>3.知识分享</td></tr>
-		<tr name="ar" class="le"><td>2591</td><td>学刚说</td><td>2020/9/16</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/sxvZtkD9JerUcS7NXV3O4Q">737 CL DFCS 测试</a></td><td>2.换件测试</td></tr>
-		<tr name="as" class="le"><td>2592</td><td>学刚说</td><td>2020/9/23</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/j-cgKMvKn6DBk_oMDtFLvQ">737 CL ACARS升级数据库小结</a></td><td>2.换件测试</td></tr>
-		<tr name="cj" class="le"><td>2593</td><td>学刚说</td><td>2020/9/25</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/DldaBFuS0lZL6AYaFayErw">737NG 一号风挡更换总结</a></td><td>2.换件测试</td></tr>
-		<tr name="as" class="lh"><td>2594</td><td>学刚说</td><td>2020/9/28</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/NkBdggHM85Lk4oB99tGjgA">737-800 容易被误会成故障的一些现象</a></td><td>5.维护提示</td></tr>
-		<tr name="cf" class="lf"><td>2595</td><td>学刚说</td><td>2020/9/30</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/chWwCBnevamyLywyTvvIWA">737NG飞机SCU的互换性</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2596</td><td>学刚说</td><td>2020/10/8</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/0A2D-IpcxB1XagKF3jaDkA">B737NG机型故障管控方案之防释压篇</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2597</td><td>学刚说</td><td>2020/10/12</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/cB9n_y1JjuKiqufgn2N0Tw">B737NG机型故障管控方案之防爆胎篇</a></td><td>3.知识分享</td></tr>
-		<tr name="ax" class="lf"><td>2598</td><td>学刚说</td><td>2020/10/15</td><td>27-00 飞行控制</td><td class="title"><a href="https://mp.weixin.qq.com/s/Nw7DBUqTkYR-wTXkQswiow">B737NG机型故障管控方案之防操纵系统失效篇</a></td><td>3.知识分享</td></tr>
-		<tr name="bi" class="lf"><td>2599</td><td>学刚说</td><td>2020/10/16</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/Tj1zQWnxzvzTxiQHWYJnAg">737NG-WHCU构型差异分析</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="ld"><td>2600</td><td>学刚说</td><td>2020/10/22</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Qjx3g23KYz-a1La2eh1Kcg">FOD极限击伤下的核心机孔探经验分享</a></td><td>1.4经验总结</td></tr>
-		<tr name="bl" class="lf"><td>2601</td><td>学刚说</td><td>2020/10/30</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/-u8-aWAMKtmSBgfj3dkzpA">737NG前缘临近传感器可靠性分析</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2602</td><td>学刚说</td><td>2020/10/31</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/xqlfCK3hBTF95oXxThNN8A">机轮也要搞名堂（747）</a></td><td>3.知识分享</td></tr>
-		<tr name="bk" class="la"><td>2603</td><td>学刚说</td><td>2020/11/4</td><td>31-51 音响警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/0mDaPb7pqsEuZNvRlU9rGA">一个387灯泡引发的故障</a></td><td>1.1故障分享</td></tr>
-		<tr name="ai" class="lf"><td>2604</td><td>学刚说</td><td>2020/11/7</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/TQZZjkDX8zP0dg3ARWl-3w">红外成像仪在飞机维修中的应用举例</a></td><td>3.知识分享</td></tr>
-		<tr name="cm" class="le"><td>2605</td><td>学刚说</td><td>2020/11/8</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/spliQHUHbjg9QYzDQLCnoQ">787发动机反推更换经验分享</a></td><td>2.换件测试</td></tr>
-		<tr name="cl" class="le"><td>2606</td><td>学刚说</td><td>2020/11/12</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/qxGMu86_vd9mmuIjHbM8gg">更换737NG发动机启动手柄线束组件经验分享</a></td><td>2.换件测试</td></tr>
-		<tr name="cm" class="le"><td>2607</td><td>学刚说</td><td>2020/11/15</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/d8Z18zpNHMMWuAj38VKeuw">737NG 发动机反推更换经验</a></td><td>2.换件测试</td></tr>
-		<tr name="ar" class="le"><td>2608</td><td>学刚说</td><td>2020/11/18</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/JmyhbLwEjCwZo21GSQAiEg">737NG 飞机自动油门测试步骤</a></td><td>2.换件测试</td></tr>
-		<tr name="ar" class="lb"><td>2609</td><td>学刚说</td><td>2020/11/22</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/4tVnKRmj9N4OgSYdnW8jiQ">关于737-800飞机MCP窗口指示黑屏的快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="ax" class="lg"><td>2610</td><td>学刚说</td><td>2020/11/27</td><td>27-00 飞行控制</td><td class="title"><a href="https://mp.weixin.qq.com/s/llPBhgGUeadMwyQFldPP5A">737 CL MEL 27-04-01 M项工作注意</a></td><td>4.MEL&放行</td></tr>
-		<tr name="aq" class="lf"><td>2611</td><td>学刚说</td><td>2020/11/30</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/Z8J3SPVP9he_RLoqNioNqQ">近期典型737NG 不安全事件工作总结</a></td><td>3.知识分享</td></tr>
-		<tr name="cc" class="le"><td>2612</td><td>学刚说</td><td>2020/12/4</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/fWFN5BU7iTMHxH4HvAQl2A">关于冲洗活门的小结</a></td><td>2.换件测试</td></tr>
-		<tr name="ap" class="ll"><td>2613</td><td>学刚说</td><td>2020/12/8</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/GSxtC-WO2e4J4YV34lSS4g">关于标准力矩的查询</a></td><td>8.2力矩查询</td></tr>
-		<tr name="bf" class="lf"><td>2614</td><td>学刚说</td><td>2020/12/12</td><td>27-81 前缘襟翼缝翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/cRWfiJlThTIY89UAeWuQDA">前缘襟缝翼失效在收上位程序介绍</a></td><td>3.知识分享</td></tr>
-		<tr name="cc" class="la"><td>2615</td><td>学刚说</td><td>2020/12/14</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/0P00Ta3hlCRnbRMBwxSvCQ">737NG饮用水箱增压泵一直工作排故总结</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="lf"><td>2616</td><td>学刚说</td><td>2020/12/19</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/Hwt_xn_n8JMETzxWx-jo7Q">737NG减震支柱充气原理解析</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="le"><td>2617</td><td>学刚说</td><td>2020/12/26</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/fGoRsgqKpZ8nCeBdErUXdQ">737电动液压泵油滤更换经验分享</a></td><td>2.换件测试</td></tr>
-		<tr name="as" class="lf"><td>2618</td><td>学刚说</td><td>2021/1/3</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/st19rwgbcV-jNjGNIpuZwA">VHF频率那点事</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lk"><td>2619</td><td>学刚说</td><td>2021/1/5</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/u0qzGm3IpZe4ducuHf-DBA">关于737NG的盖板螺钉的查找方法小结</a></td><td>8.1件号查询</td></tr>
-		<tr name="ah" class="lh"><td>2620</td><td>学刚说</td><td>2021/1/8</td><td>H.冬季运行</td><td class="title"><a href="https://mp.weixin.qq.com/s/eOjikv9Wk4rswmvwxdQAIA">NG飞机冬季放水注意事项</a></td><td>5.维护提示</td></tr>
-		<tr name="af" class="lb"><td>2621</td><td>学刚说</td><td>2021/1/12</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/sGa6oiKvHk0LNpBxdLYIyA">关于787 ECS接近盖板检查及脱落后的快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="at" class="lb"><td>2622</td><td>学刚说</td><td>2021/1/13</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/zaJClHmEMJmGShN_xSdc9A">整舱-经济舱+商务舱旅客座椅OUTLET 输出端无法充电快速排故指南</a></td><td>1.2故障处置</td></tr>
-		<tr name="cc" class="lc"><td>2623</td><td>学刚说</td><td>2021/1/16</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/xU_ocB0qpir84VViBvvAcg">737NG客机饮用水排放工作中LAVATORY WATER HEATER跳开关对厕所照明灯的逻辑影响</a></td><td>1.3故障分析</td></tr>
-		<tr name="bl" class="le"><td>2624</td><td>学刚说</td><td>2021/1/18</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/DOPVWgwe5Bs44Qgc0Vkliw">737NG主轮更换总结</a></td><td>2.换件测试</td></tr>
-		<tr name="cb" class="la"><td>2625</td><td>学刚说</td><td>2021/1/19</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/kzVhDbAZmxK8ILeh0LDrgQ">737NG飞机发动机引气温度高排故总结</a></td><td>1.1故障分享</td></tr>
-		<tr name="af" class="le"><td>2626</td><td>学刚说</td><td>2021/1/20</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/mFuqICe3VzfVuMf6rrke_Q">787EMA更换总结</a></td><td>2.换件测试</td></tr>
-		<tr name="af" class="le"><td>2627</td><td>学刚说</td><td>2021/1/21</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/8dmD7UJuD1y5ei-5E4BIHg">787 FAN COWLS 开关注意事项</a></td><td>2.换件测试</td></tr>
-		<tr name="cb" class="li"><td>2628</td><td>学刚说</td><td>2021/1/22</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/sZxxSd9tXgq3QNu_C16Z6w">一线维修的“定点爆破” ——737NG DUCT PRESSURE HIGH</a></td><td>6.总结教程</td></tr>
-		<tr name="cl" class="ld"><td>2629</td><td>学刚说</td><td>2021/1/23</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/lyv2X27y7723qh2gcxp2ng">孔探检查CFM56-7B HPC2、3级静子蜂窝封严的风险总结</a></td><td>1.4经验总结</td></tr>
-		<tr name="af" class="le"><td>2630</td><td>学刚说</td><td>2021/1/24</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/zGWbfwyh5ynpMJYu5rPoGQ">B787飞机EMCU拆装介绍</a></td><td>2.换件测试</td></tr>
-		<tr name="af" class="le"><td>2631</td><td>学刚说</td><td>2021/1/25</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/eB_vfTDYZmxctc0BDzeokw">787主燃油/滑油热交换器压差传感器更换</a></td><td>2.换件测试</td></tr>
-		<tr name="af" class="ld"><td>2632</td><td>学刚说</td><td>2021/1/26</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/4qiamF1ZnfL3mTah1YnBoQ">B-20XX C2 EMP间歇性故障排故小结</a></td><td>1.4经验总结</td></tr>
-		<tr name="af" class="le"><td>2633</td><td>学刚说</td><td>2021/1/28</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/7O8enrKL3ybYxD1TYI-kNQ">787 电扰校装</a></td><td>2.换件测试</td></tr>
-		<tr name="cl" class="lf"><td>2634</td><td>学刚说</td><td>2021/1/29</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/3ubDcA24qTD8wV45qegVMQ">737NG飞机PS13探头</a></td><td>3.知识分享</td></tr>
-		<tr name="bd" class="le"><td>2635</td><td>学刚说</td><td>2021/1/30</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/R88KuWI7vvCAeF9iwWSVZg">737NG后缘襟翼位置传感器的更换</a></td><td>2.换件测试</td></tr>
-		<tr name="ar" class="le"><td>2636</td><td>学刚说</td><td>2021/2/2</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/3r75tgDq9Kly-kxwVVO66g">737NG起动刹车电门组件更换</a></td><td>2.换件测试</td></tr>
-		<tr name="ar" class="le"><td>2637</td><td>学刚说</td><td>2021/2/4</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/uNE6f2Y8bt0ZhQakFRPslw">737NG自动油门伺服马达更换总结</a></td><td>2.换件测试</td></tr>
-		<tr name="af" class="lf"><td>2638</td><td>学刚说</td><td>2021/2/17</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/-ZPHJOf9ePX5hNG9-IY1Bw">787SRM简易查询</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2639</td><td>学刚说</td><td>2021/2/20</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/jlBAldsiFNU00M5LIUQr2A">说说“机会检与区域检”</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="le"><td>2640</td><td>学刚说</td><td>2021/2/21</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/KQDbGLW5weimLpnjTdaw0g">737NG预冷器在位更换</a></td><td>2.换件测试</td></tr>
-		<tr name="aq" class="ld"><td>2641</td><td>学刚说</td><td>2021/2/22</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/Ue8fqW1Vp_TXuu8oq6V52g">737CL 飞机左组件管道过热灯灯亮排故总结</a></td><td>1.4经验总结</td></tr>
-		<tr name="af" class="le"><td>2642</td><td>学刚说</td><td>2021/2/25</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/zWpxqFs3oTa_0oHw8JqD5Q">787功能检查主电瓶充电容量</a></td><td>2.换件测试</td></tr>
-		<tr name="cg" class="lc"><td>2643</td><td>学刚说</td><td>2021/2/26</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/mYMuuv3R9Zsb6gFr0aCozw">外接电源插口附近由于承重挂钩导致加强片受损的案例分析</a></td><td>1.3故障分析</td></tr>
-		<tr name="ai" class="lf"><td>2644</td><td>学刚说</td><td>2021/3/3</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/jcBgw-0BV688P1pCGRAtNA">机务OJT培训现状及解决建议</a></td><td>3.知识分享</td></tr>
-		<tr name="bz" class="lf"><td>2645</td><td>学刚说</td><td>2021/3/8</td><td>34-61 FMCS</td><td class="title"><a href="https://mp.weixin.qq.com/s/F63zdsX9fSYWNiNebWv9yw">关于RNP进近及下降剖面知识点的学习</a></td><td>3.知识分享</td></tr>
-		<tr name="bw" class="lf"><td>2646</td><td>学刚说</td><td>2021/3/10</td><td>34-46 EGPWS</td><td class="title"><a href="https://mp.weixin.qq.com/s/JdDNBNr8gKrUnfY7nJvkHw">关于EGPWS高度呼出的学习</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lb"><td>2647</td><td>学刚说</td><td>2021/3/11</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/VINB_HbTre_LSUMgbu9-Pg">737NG-80-发动机无法启动快速处置单</a></td><td>1.2故障处置</td></tr>
-		<tr name="at" class="le"><td>2648</td><td>学刚说</td><td>2021/3/13</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/5zsF0-zGYQGOHSsZqdJD1A">737NG IDG 更换总结</a></td><td>2.换件测试</td></tr>
-		<tr name="aq" class="lb"><td>2649</td><td>学刚说</td><td>2021/3/14</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/zwr-TIyT_tK9Lnq5toxE7Q">737NG-21-空调组件地面PACK灯亮快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="aq" class="ld"><td>2650</td><td>学刚说</td><td>2021/3/16</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/tqwbL-A5tdhH1yWCLWr-Lw">EFLOW构型飞机区域温度灯亮</a></td><td>1.4经验总结</td></tr>
-		<tr name="ay" class="la"><td>2651</td><td>学刚说</td><td>2021/3/18</td><td>27-11 副翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/adQHT3JYF4gqUdhFWVM5dA">防差错案例学习之副翼方向舵配平面板方向装反</a></td><td>1.1故障分享</td></tr>
-		<tr name="bi" class="lg"><td>2652</td><td>学刚说</td><td>2021/3/21</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/dphAz425KyzYj4Wz34ex9Q">B737-CL 飞机MEL30-3锁发动机防冰活门M项工作</a></td><td>4.MEL&放行</td></tr>
-		<tr name="ar" class="le"><td>2653</td><td>学刚说</td><td>2021/3/22</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/J0hPTvGYcXLiJimhq402_Q">737 NG DFCS 完整测试步骤</a></td><td>2.换件测试</td></tr>
-		<tr name="cl" class="lf"><td>2654</td><td>学刚说</td><td>2021/3/26</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/nO4VrS5QtOsfzIDxYFAjcw">737NG换季工作之---水洗发动机</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2655</td><td>学刚说</td><td>2021/4/3</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/wHwjW5O2_aVFLLb_K5oG0Q">如何查找QACVR线路改装所需工具</a></td><td>3.知识分享</td></tr>
-		<tr name="bs" class="lc"><td>2656</td><td>学刚说</td><td>2021/4/4</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/Hg1Z3U8sD_HAO8E__3DhYQ">关于737-800飞机导航源选择电门不在正常位引发的不正常事件分析</a></td><td>1.3故障分析</td></tr>
-		<tr name="bz" class="lc"><td>2657</td><td>学刚说</td><td>2021/4/6</td><td>34-61 FMCS</td><td class="title"><a href="https://mp.weixin.qq.com/s/YZVsuFb6K9k-u7Ler-eQYQ">B-15XX飞机郑州LNAV地面无法衔接解析</a></td><td>1.3故障分析</td></tr>
-		<tr name="ai" class="lf"><td>2658</td><td>学刚说</td><td>2021/4/7</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/RCi8i_yJ3XuNTIjcY6-5PQ">常见的培训方法以及在民航机务培训中的应用</a></td><td>3.知识分享</td></tr>
-		<tr name="bi" class="lf"><td>2659</td><td>学刚说</td><td>2021/4/8</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/mZVumWU14wwO375Ykug9Xw">浅显入门：737-800发动机整流罩防冰活门</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2660</td><td>学刚说</td><td>2021/4/9</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/uJQBEa_SLEuN7UWBZXC6yg">常用工具之扳手篇</a></td><td>3.知识分享</td></tr>
-		<tr name="bd" class="le"><td>2661</td><td>学刚说</td><td>2021/4/13</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/8uJTdipP_ceeNa_mUYhdww">737NG内侧后缘襟翼后襟翼ROLLER更换</a></td><td>2.换件测试</td></tr>
-		<tr name="aq" class="le"><td>2662</td><td>学刚说</td><td>2021/4/18</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/d1smAoeEA9-2DNq-2BH1Pg">737NG飞机清洗空调热交换器</a></td><td>2.换件测试</td></tr>
-		<tr name="af" class="le"><td>2663</td><td>学刚说</td><td>2021/4/20</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/QgfF0f-qlFTRt4Ha11QjTg">787-9 前厨房天花板拆装参考</a></td><td>2.换件测试</td></tr>
-		<tr name="bl" class="lf"><td>2664</td><td>学刚说</td><td>2021/4/21</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/t_q8X2xMYKxzCoH6F5fI6w">737-NG飞机PSEU简单介绍</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="le"><td>2665</td><td>学刚说</td><td>2021/4/23</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZLF-szrU8ffDdOP2xIcVYw">787冲压空气出气口曲柄门轴更换</a></td><td>2.换件测试</td></tr>
-		<tr name="ai" class="lf"><td>2666</td><td>学刚说</td><td>2021/4/25</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/8FG2F2rKhHDZdd5NLqROhw">安全管理与熵增定律</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>2667</td><td>学刚说</td><td>2021/4/26</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/D-nz2L4KXwfWicIp6W7rbQ">浅谈安全管理体系（SMS）与风险管理</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="lf"><td>2668</td><td>学刚说</td><td>2021/4/29</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/jol2ZKSJ2WO_9uoozIodSQ">硬管施工</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2669</td><td>学刚说</td><td>2021/5/5</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/UzDIy9K3JS1Dmh0BqZDGBg">B737-800发动机倒托架（CFM56-7B）</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="la"><td>2670</td><td>学刚说</td><td>2021/5/7</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/BlO1aFSw9TjNPF-qm2LRFg">737NG防范座舱释压风险案例学习</a></td><td>1.1故障分享</td></tr>
-		<tr name="af" class="lh"><td>2671</td><td>学刚说</td><td>2021/5/12</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/mj0xsVLk0E3TWYnG9SfpPg">更换WCU注意事项</a></td><td>5.维护提示</td></tr>
-		<tr name="as" class="lb"><td>2672</td><td>学刚说</td><td>2021/5/13</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/1kLBumeKxLImm30yB0omtg">737-23-ACARS 常见故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="ap" class="lf"><td>2673</td><td>学刚说</td><td>2021/5/16</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/rlCnvyXw516hkpQjuHLbpg">737 CL前轮转弯系统钢索张力调节</a></td><td>3.知识分享</td></tr>
-		<tr name="af" class="lc"><td>2674</td><td>学刚说</td><td>2021/5/19</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/qTFHn9L8oqbQA8xzQq5VnA">787应急灯系统故障浅析</a></td><td>1.3故障分析</td></tr>
-		<tr name="au" class="ld"><td>2675</td><td>学刚说</td><td>2021/5/20</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/RiNTjthWH2AJP5a8_SXO-Q">关于飞行员座椅靠背无法调节经验总结</a></td><td>1.4经验总结</td></tr>
-		<tr name="bl" class="lf"><td>2676</td><td>学刚说</td><td>2021/5/22</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/J_kaq313apWkhHlQPd_Nog">737NG前起落架锁传感器封严胶检查与施工</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="le"><td>2677</td><td>学刚说</td><td>2021/5/31</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/JlIBpNEmiy-K6ipyKgM91A">说说波音飞机的液压软管的维护</a></td><td>2.换件测试</td></tr>
-		<tr name="bt" class="lb"><td>2678</td><td>学刚说</td><td>2021/6/2</td><td>34-33 LRRA</td><td class="title"><a href="https://mp.weixin.qq.com/s/VJ8kuqUrPAE4LJv9WxkRQw">737NG无线电高度故障快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="bl" class="lb"><td>2679</td><td>学刚说</td><td>2021/6/5</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/-ea3fC7QN5u-Z8Lpfe0x1w">737NG飞机PSEU灯亮快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="ai" class="lf"><td>2680</td><td>学刚说</td><td>2021/6/8</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/Ie_usUnfMSBDwsMqPuO4eQ">线路量线的基本知识</a></td><td>3.知识分享</td></tr>
-		<tr name="at" class="lb"><td>2681</td><td>学刚说</td><td>2021/6/14</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/3Z8-GmdGXJcKJkPMR3T6Zw">737NG-“ELEC”灯亮快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="cb" class="lb"><td>2682</td><td>学刚说</td><td>2021/6/16</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/PBAm0P0vs-fGiaNxJQRY6A">737NG-36-发动机引气故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="aq" class="lb"><td>2683</td><td>学刚说</td><td>2021/6/20</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/PuI0AWNZw9mBLi1eUiIu7A">737NG-21-自动增压故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="af" class="lh"><td>2684</td><td>学刚说</td><td>2021/6/25</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/u__unYttvdN6CfVpXZaEyA">GENX-1B发动机孔探注意事项</a></td><td>5.维护提示</td></tr>
-		<tr name="af" class="le"><td>2685</td><td>学刚说</td><td>2021/6/26</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/v433k1jGYUChwNkyetEuKg">787-9反推滑套更换</a></td><td>2.换件测试</td></tr>
-		<tr name="cj" class="lh"><td>2686</td><td>学刚说</td><td>2021/6/27</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/bdoLOgyEJU4D6z2__zIG7Q">737NG飞机二号风挡开关的注意事项</a></td><td>5.维护提示</td></tr>
-		<tr name="bf" class="lb"><td>2687</td><td>学刚说</td><td>2021/7/7</td><td>27-81 前缘襟翼缝翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/8BH0HOoSdCUHeYYCAICHjQ">737NG前缘装置传感器失效快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="aq" class="lb"><td>2688</td><td>学刚说</td><td>2021/7/8</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/tPCeHW5CmRRxd4-IUKymnQ">737NG区域温度灯亮快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="am" class="lb"><td>2689</td><td>学刚说</td><td>2021/7/10</td><td>05-51-19 雷击</td><td class="title"><a href="https://mp.weixin.qq.com/s/LdPzIVHkzPleQyiyIdQ8uw">737-NG-翼尖小翼雷击后快速处置单</a></td><td>1.2故障处置</td></tr>
-		<tr name="cg" class="lf"><td>2690</td><td>学刚说</td><td>2021/7/13</td><td>51-00 结构防腐</td><td class="title"><a href="https://mp.weixin.qq.com/s/nFNAISSDfKFizAWieoYuQg">渗透检测与渗漏检查的互通</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2691</td><td>学刚说</td><td>2021/7/21</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/T9pG9xqxoEKdvQgZ4Hma9g">关于CFM56-7B发动机LPT1级导向器真假裂纹的经验心得</a></td><td>3.知识分享</td></tr>
-		<tr name="cc" class="le"><td>2692</td><td>学刚说</td><td>2021/7/22</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/G0-Q5PHrDs9SXLd8TdT6MA">737NG 饮用水消毒</a></td><td>2.换件测试</td></tr>
-		<tr name="cf" class="lh"><td>2693</td><td>学刚说</td><td>2021/7/23</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/xoLJLcDsIUTaSjH2JEbIRg">737NG APU滑油滤更换注意事项</a></td><td>5.维护提示</td></tr>
-		<tr name="cf" class="le"><td>2694</td><td>学刚说</td><td>2021/7/24</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/qCgo0YNeEUwRk54nmphcZg">737NG APU 启动发电机更换</a></td><td>2.换件测试</td></tr>
-		<tr name="cl" class="le"><td>2695</td><td>学刚说</td><td>2021/7/26</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/BpdxA7MplkPc06RmystgDA">737NG右侧VSV作动筒拆换总结</a></td><td>2.换件测试</td></tr>
-		<tr name="bd" class="lb"><td>2696</td><td>学刚说</td><td>2021/8/10</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/kRPr23IEz6xvVzA_QEonrA">737-NG-后缘襟翼旁通快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="bp" class="le"><td>2697</td><td>学刚说</td><td>2021/8/11</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/B9GesJ_Tuo-LIzXsZtmXUA">关于 737飞机皮托管更换之后微压测试仪的使用</a></td><td>2.换件测试</td></tr>
-		<tr name="aq" class="lb"><td>2698</td><td>学刚说</td><td>2021/8/12</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/pxoaji97o_uHlfSJVUa33w">737NG-21-设备冷却OFF灯亮故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="cc" class="le"><td>2699</td><td>学刚说</td><td>2021/8/16</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/jaq4UEScd6eDh6ljo1XA8w">737NG后排水桅杆排故及拆装保姆级教程</a></td><td>2.换件测试</td></tr>
-		<tr name="cl" class="le"><td>2700</td><td>学刚说</td><td>2021/8/17</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/8SE2QWc7kX0Y4MR5tghQuw">737 CL 飞机的VSV 校装</a></td><td>2.换件测试</td></tr>
-		<tr name="ai" class="lf"><td>2701</td><td>学刚说</td><td>2021/8/18</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/mij8NslG7_bEMK2XgK488w">MENTOR EM低频与帧数冲突解决办法</a></td><td>3.知识分享</td></tr>
-		<tr name="bu" class="lb"><td>2702</td><td>学刚说</td><td>2021/8/23</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/2X2tVqbSEqZ00cLy6teKxg">737NG-34-气象雷达故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="at" class="la"><td>2703</td><td>学刚说</td><td>2021/8/24</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/bCur_XCZX8pFiGB0Wh3FGg">737NG的CAB/UTIL电门、IFE/PASS SEAT电门与电源系统构型卸载</a></td><td>1.1故障分享</td></tr>
-		<tr name="ca" class="lh"><td>2704</td><td>学刚说</td><td>2021/8/26</td><td>35-00 氧气</td><td class="title"><a href="https://mp.weixin.qq.com/s/vq-Nr95btVZ1qzyhl-J-GQ">737NG 机组氧气瓶维护注意事项</a></td><td>5.维护提示</td></tr>
-		<tr name="af" class="lf"><td>2705</td><td>学刚说</td><td>2021/8/28</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/SSAIVxeNnw2iQrAOhDakGQ">787重要区域工作注意事项</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="le"><td>2706</td><td>学刚说</td><td>2021/9/1</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/WTVQ1pPaHiZir7f86T0BXA">737NG更换主磁堵SPOOL封圈</a></td><td>2.换件测试</td></tr>
-		<tr name="cl" class="le"><td>2707</td><td>学刚说</td><td>2021/9/2</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/po1UvAaVqq0nvOlzGzjSlQ">737NG更换TGB</a></td><td>2.换件测试</td></tr>
-		<tr name="bh" class="lf"><td>2708</td><td>学刚说</td><td>2021/9/7</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/F1OLDfcYtYjdBj-hqjFI8w">737NG-29-空中液压油量低快速处置单</a></td><td>3.知识分享</td></tr>
-		<tr name="bb" class="lb"><td>2709</td><td>学刚说</td><td>2021/9/9</td><td>27-32 失速警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/a-TsBDV6Vk5mKhq_j_aiHg">737NG偏航阻尼故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="bc" class="lb"><td>2710</td><td>学刚说</td><td>2021/9/11</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/imriA1MsxGxidS6RwVqBjA">737NG-27-安定面配平故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="cf" class="lb"><td>2711</td><td>学刚说</td><td>2021/9/17</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/P5M9_xAA2BrpDcC5AX24Hg">737NG APU维护灯亮快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="cf" class="le"><td>2712</td><td>学刚说</td><td>2021/9/21</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/W5i1-qF_tJRsQHyYYhdJ4A">737NG APU进口燃油滤更换注意事项</a></td><td>2.换件测试</td></tr>
-		<tr name="ap" class="lf"><td>2713</td><td>学刚说</td><td>2021/9/23</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/Ms3FuT6RlUEnquoYtLStSA">密封圈</a></td><td>3.知识分享</td></tr>
-		<tr name="bg" class="le"><td>2714</td><td>学刚说</td><td>2021/9/26</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/5JquYLImlYu1EUgrz9aVTQ">737NG燃油浮子电门更换保姆级教程</a></td><td>2.换件测试</td></tr>
-		<tr name="cb" class="le"><td>2715</td><td>学刚说</td><td>2021/10/4</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/z8qCleAQN_3sAq_U4p6t5w">气源系统管路检查施工指南</a></td><td>2.换件测试</td></tr>
-		<tr name="bi" class="lb"><td>2716</td><td>学刚说</td><td>2021/10/14</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/CWDtCCaiFIvA1-Lj_HDYSA">737NG-30-风挡加温故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="ce" class="lb"><td>2717</td><td>学刚说</td><td>2021/10/17</td><td>47-00 NGS</td><td class="title"><a href="https://mp.weixin.qq.com/s/PS-cm6Wvjvto0Wqrhr869w">737NG-47-NGS故障快速处置</a></td><td>1.2故障处置</td></tr>
-		<tr name="bl" class="le"><td>2718</td><td>学刚说</td><td>2021/10/23</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/JEQ13iEr3a9iLRrMW7d-Sg">737NG自动刹车压力控制组件更换保姆级教程</a></td><td>2.换件测试</td></tr>
-		<tr name="cm" class="le"><td>2719</td><td>学刚说</td><td>2021/10/25</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/fadf18f1ufyKoiR4-O3pVQ">737NG反推上位锁完整性测试</a></td><td>2.换件测试</td></tr>
-		<tr name="cl" class="lf"><td>2720</td><td>学刚说</td><td>2021/10/26</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/xdSr7C5D98evh_8Izmsdeg">浅谈737NG飞机发动机漏油</a></td><td>3.知识分享</td></tr>
-		<tr name="bi" class="la"><td>2721</td><td>学刚说</td><td>2021/10/27</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/MFddU7wF8l3EECikFD9PzQ">针对B-1XXX风挡加温电门在ON位时 OVERHEAT故障灯亮的总结</a></td><td>1.1故障分享</td></tr>
-		<tr name="af" class="lf"><td>2722</td><td>学刚说</td><td>2021/10/31</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/9ekIjWj3a9AIgqDsDByFcw">787空调系统---CAC及其维护注意事项</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2723</td><td>艺不压身</td><td>2014/3/28</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/bLpvX5hnPU1wD_QVH8lpZw">B737主起落架易损接头简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2724</td><td>艺不压身</td><td>2014/4/9</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/htC8l7AHpKKMYpU19NLDfA">起落架收放原理简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2725</td><td>艺不压身</td><td>2014/4/30</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/qkfpn_Qg1eJwsWAUBAh6Pw">关注高空推力裕度保护（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2726</td><td>艺不压身</td><td>2014/10/4</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/QS0HSipUWEjFAlTNl9bqrQ">B737NG发动机控制系统故障简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2727</td><td>艺不压身</td><td>2014/10/13</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/e8iIKYDPfBmuQ2Wt6Blaiw">三分钟教你读懂RAIM预报（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bc" class="lf"><td>2728</td><td>艺不压身</td><td>2014/11/10</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/SIXdh9d-RVUS_923ZF1rsA">利用“观想法”处置安定面配平故障（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2729</td><td>艺不压身</td><td>2014/12/29</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/9inlSL2mM04C656l68cxgA">B737增压系统故障简介之一：控制失效（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2730</td><td>艺不压身</td><td>2015/1/16</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/JfEkVOT5PY3yhucFIpKeVg">B737增压系统故障简介之二：入不敷出（上）（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2731</td><td>艺不压身</td><td>2015/1/20</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/7hQPcF-rEVxZp5Q24vX1-w">B737NG组件故障简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="aw" class="lf"><td>2732</td><td>艺不压身</td><td>2015/7/5</td><td>26-18 过热探测</td><td class="title"><a href="https://mp.weixin.qq.com/s/zUNDwvxcvl6wiFUARmFIhg">B737NG飞机温度控制系统故障简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bu" class="lf"><td>2733</td><td>艺不压身</td><td>2015/7/16</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/UOAtgDNoGVjiCl5hikWGQQ">气象雷达进阶技巧之一有“核儿（H ú）”有“皮儿”（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bu" class="lf"><td>2734</td><td>艺不压身</td><td>2015/8/20</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/x8Hc7gpbu18m-3kWeTnbYg">气象雷达进阶使用技巧之二 “站着”？“躺着”？（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2735</td><td>艺不压身</td><td>2015/10/21</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/jn1S585KV7niIg8KJ5qQvg">对“全温陡升”现象的辨析（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2736</td><td>艺不压身</td><td>2016/7/21</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/SN2nfvQ4hlFd9rR2-G7XWQ">对B737NG飞机新构型组件非指令关闭的探讨（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2737</td><td>艺不压身</td><td>2016/8/1</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/ahbAfXngDA3hxSSiIzk17w">对《空速不可靠检查单》“475/1080”记忆项目的验证（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2738</td><td>艺不压身</td><td>2016/10/10</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/BxcHC1pnwT5LGsnoch4xyA">“空速不可靠”故障处置简介(第一节)（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2739</td><td>艺不压身</td><td>2016/10/11</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/5gjUvQcVrRDsZ50h1XH1gg">“空速不可靠”故障处置简介（第二节 处置思路）（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2740</td><td>艺不压身</td><td>2016/10/12</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/3bmE2Ze7FmqcsAL2m4FfgA">空速不可靠故障处置简介（三）性能表使用技巧（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2741</td><td>艺不压身</td><td>2016/10/16</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/eigCTPBCiUaro2G05AUkfA">空速不可靠故障处置简介（四）垂直速度可靠性探讨（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2742</td><td>艺不压身</td><td>2016/10/19</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/sjVszRWb3mEuXdfmUAkGMQ">空速不可靠处置简介（五）尽可能平飞处置（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="ax" class="lf"><td>2743</td><td>艺不压身</td><td>2016/11/13</td><td>27-00 飞行控制</td><td class="title"><a href="https://mp.weixin.qq.com/s/IS2FtIhVQbcZtFXC-HqdlA">起飞空速悬挂的处置（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2744</td><td>艺不压身</td><td>2016/12/26</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/6MUvF52Yi1nv7L4j2dcHSw">发动机过热故障简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2745</td><td>艺不压身</td><td>2017/2/1</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/lfogxhsq1JNQZUdHGOGYnA">发动机过热番外篇（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="av" class="lf"><td>2746</td><td>艺不压身</td><td>2017/2/3</td><td>26-00 防火</td><td class="title"><a href="https://mp.weixin.qq.com/s/vHY2TRTKGXntrfDPdCxcNQ">发动机火警处置简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="ae" class="lf"><td>2747</td><td>艺不压身</td><td>2017/8/1</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/AILExHalKH1I6WG-bbYS6w">记一次典型的高空临近超速事件（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="ld"><td>2748</td><td>艺不压身</td><td>2017/8/19</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/g_X0pUP0SKEwYAFc_RdWNg">发动机起动相关故障简介</a></td><td>1.4经验总结</td></tr>
-		<tr name="cl" class="lf"><td>2749</td><td>艺不压身</td><td>2017/10/17</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/VzFzbuayRBbgQJNXA_2KEQ">飞机也得“减压症”（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>2750</td><td>艺不压身</td><td>2017/10/27</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/AmMsHZeEBD9ohodMdX5FNw">发动机失速和喘振故障简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bz" class="lf"><td>2751</td><td>艺不压身</td><td>2017/11/20</td><td>34-61 FMCS</td><td class="title"><a href="https://mp.weixin.qq.com/s/M94tFXdUX6F7VnjiMRxWWQ">FMC失效加入等待航线的技巧（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2752</td><td>艺不压身</td><td>2018/3/4</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/xvSSnDB9mFbtWeGA-WA-Hw">自动刹车解除预位故障简介（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="bf" class="lf"><td>2753</td><td>艺不压身</td><td>2018/7/20</td><td>27-81 前缘襟翼缝翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/U9ZHOMMYOzpschBIMcZPcw">前缘襟翼过渡故障的处置思路（飞行员）</a></td><td>3.知识分享</td></tr>
-		<tr name="ae" class="lf"><td>2754</td><td>艺不压身</td><td>2021/3/16</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/CgQuzxB8mOLMPi33zBrXNg">沙尘暴到底能不能飞？</a></td><td>3.知识分享</td></tr>
-		<tr name="bu" class="lf"><td>2755</td><td>艺不压身</td><td>2021/8/14</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/TYICKoeZD2Wbwe0Sivv8ow">雷达减增益怎么用？</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lb"><td>2756</td><td>硬核航空</td><td>2019/5/20</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/W8rFtca0j4MrKjSblsyUYg">三个臭皮匠，如何顶个诸葛亮（ACARS NO COMM）</a></td><td>1.2故障处置</td></tr>
-		<tr name="bg" class="lg"><td>2757</td><td>硬核航空</td><td>2019/6/6</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/ktVO_1uo3eCCbGxgF7ya4w">燃油故事(1)：B737NG加油活门保留问题</a></td><td>4.MEL&放行</td></tr>
-		<tr name="bg" class="la"><td>2758</td><td>硬核航空</td><td>2019/6/11</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/zGh1h9x1qxqFlZgBlxQijw">燃油故事(2)：B737NG中央燃油箱指示故障问题</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="lf"><td>2759</td><td>硬核航空</td><td>2019/6/22</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/lRPE2J7F0zJkrwTpoYfsXQ">燃油故事(3)：底部漏油，发动机也可以不背锅</a></td><td>3.知识分享</td></tr>
-		<tr name="bg" class="lf"><td>2760</td><td>硬核航空</td><td>2019/6/24</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/v5FXjMBx0wbTKJkdujplmA">燃油故事(4)：关于发动机燃油翼梁活门的几点补充</a></td><td>3.知识分享</td></tr>
-		<tr name="bg" class="lf"><td>2761</td><td>硬核航空</td><td>2019/7/1</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/RojjZt0rV6mQvbriZ4SBqQ">燃油故事(5)：用“回路”的概念来理解“倒油”</a></td><td>3.知识分享</td></tr>
-		<tr name="ae" class="lf"><td>2762</td><td>硬核航空</td><td>2019/7/30</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/aXVd5JQqcFfEvhrFMLDcIw">备胎分类学：STANDBY OR ALTERNATE, THAT IS A QUESTION.</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="la"><td>2763</td><td>硬核航空</td><td>2019/8/3</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/IOzCM7zoxY2PU62bbxwQpw">头痛何以医脚：代码TCV，故障ACM</a></td><td>1.1故障分享</td></tr>
-		<tr name="aq" class="lb"><td>2764</td><td>硬核航空</td><td>2019/8/9</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/0tKheZNFRdsrDZ2w_w3-Og">界面与逻辑：B737NG组件跳开如何复位</a></td><td>1.2故障处置</td></tr>
-		<tr name="bi" class="lf"><td>2765</td><td>硬核航空</td><td>2019/9/8</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/MIo-CW5z-_t9Iht6_8ZwjA">大翼前缘大脾气：怕冷怕热爱挑剔</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lg"><td>2766</td><td>硬核航空</td><td>2020/1/15</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/toZFDX4qwWBpI_NSEHF5Kw">MEL解释：B737NG被重构的左点火系统</a></td><td>4.MEL&放行</td></tr>
-		<tr name="aq" class="lf"><td>2767</td><td>硬核航空</td><td>2020/2/16</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/z54uHL6ayoprVQw4xpa_HQ">ACM：飞机空调的动力装置</a></td><td>3.知识分享</td></tr>
-		<tr name="cc" class="lb"><td>2768</td><td>硬核航空</td><td>2020/2/21</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/olnKu6kf3skmmWT2En8YZg">飞行员想知道：真空马桶如何检查</a></td><td>1.2故障处置</td></tr>
-		<tr name="cb" class="lf"><td>2769</td><td>硬核航空</td><td>2020/2/24</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/TcW8eHqFRoKqsxd5XcakXA">不畏真空、高处胜寒：发动机引气调压与温控的原理</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="li"><td>2770</td><td>硬核航空</td><td>2020/2/26</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/kGeFNrOHf2_Zadb7sgjqeQ">B737NG引气跳开的处置及原理</a></td><td>6.总结教程</td></tr>
-		<tr name="aq" class="ld"><td>2771</td><td>硬核航空</td><td>2020/3/8</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/V8N_G-rWo2AM4F0JIpHDKA">【QRH】座舱温度高：隔离故障与重构通风形态</a></td><td>1.4经验总结</td></tr>
-		<tr name="bg" class="lf"><td>2772</td><td>硬核航空</td><td>2020/3/17</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/w6_PVkmhRpQ7RPaXgjckhQ">劫富不济贫：空中燃油平衡程序</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>2773</td><td>硬核航空</td><td>2020/3/23</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/GdsdZh9m_UbN-sQiB5r_FQ">经典起落架：系统原理和应急处置</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2774</td><td>硬核航空</td><td>2020/4/6</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/ScQZajCK2qccHA7Pbg1YjQ">放电刷：静电、无线电和雷神索尔</a></td><td>3.知识分享</td></tr>
-		<tr name="cm" class="li"><td>2775</td><td>硬核航空</td><td>2020/7/15</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/YV2qmdMqumguObvfPAnZng">反推怎么拉：原理、操作和测试</a></td><td>6.总结教程</td></tr>
-		<tr name="cm" class="lj"><td>2776</td><td>硬核航空</td><td>2020/7/16</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/2FWMoQOsDGttS3px62McKw">B737NG反推锁定作动筒完好性测试（官方视频+中英文字幕）</a></td><td>7.视频资料</td></tr>
-		<tr name="at" class="lf"><td>2777</td><td>硬核航空</td><td>2020/9/6</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/kdsdTs_kye8saCcS8qwYBA">智能电网从不断电：汇流条的“续传”功能</a></td><td>3.知识分享</td></tr>
-		<tr name="at" class="lf"><td>2778</td><td>硬核航空</td><td>2020/9/7</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/1NkaZt65CW1vNUWBld4KTg">这个汇流条不转换：SW HOT BAT BUS</a></td><td>3.知识分享</td></tr>
-		<tr name="at" class="lf"><td>2779</td><td>硬核航空</td><td>2020/9/20</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/-E3CapyZl1iYNdpqOL3q3g">再谈BUS TRANSFER</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2780</td><td>硬核航空</td><td>2020/9/28</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/ASJoJCAcAsqBkHb9hi12ug">OEV（机外排气活门）怎么用？</a></td><td>3.知识分享</td></tr>
-		<tr name="ar" class="lf"><td>2781</td><td>硬核航空</td><td>2020/9/29</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/bOz3yscZQNESzM6Oeq7Tig">如何理解MCP速度方式？</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lf"><td>2782</td><td>硬核航空</td><td>2020/12/17</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/uBbj1vUlAqzu4GSlhFN87A">PTU：龙骨梁上的液压隐士</a></td><td>3.知识分享</td></tr>
-		<tr name="bc" class="lf"><td>2783</td><td>硬核航空</td><td>2020/12/27</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/TC58dXJ4wOhHTLvd5NpODg">手册里的SCREWJACK是怎么回事？</a></td><td>3.知识分享</td></tr>
-		<tr name="bc" class="lf"><td>2784</td><td>硬核航空</td><td>2020/12/27</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/TC58dXJ4wOhHTLvd5NpODg">手册里的SCREWJACK是怎么回事？</a></td><td>3.知识分享</td></tr>
-		<tr name="bd" class="lf"><td>2785</td><td>硬核航空</td><td>2020/12/30</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/1gmv6mGSK4BSPFFarpGGwA">小船里的小秘密：关于后缘襟翼的7条冷知识</a></td><td>3.知识分享</td></tr>
-		<tr name="ae" class="lg"><td>2786</td><td>硬核航空</td><td>2021/1/24</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/nJOUb-VsLG1HwvdeyYp3Bw">MEL高频词：飞机为什么有这么多“系统”？</a></td><td>4.MEL&放行</td></tr>
-		<tr name="ae" class="lg"><td>2787</td><td>硬核航空</td><td>2021/1/28</td><td>E.其他民航知识</td><td class="title"><a href="https://mp.weixin.qq.com/s/k_KIa7Rqb7ETSvEKouCYHg">机组可以执行M项吗？</a></td><td>4.MEL&放行</td></tr>
-		<tr name="bp" class="lf"><td>2788</td><td>硬核航空</td><td>2021/2/7</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/mq-G0yDyM44dfE5EUAU4zg">惯导漂移1：明明已经刹车，为何还有地速？</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>2789</td><td>硬核航空</td><td>2021/2/14</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/bZwzDcQ2gGIwh1DZiHAxlw">在家怎么看机场的实时天气呢？</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>2790</td><td>硬核航空</td><td>2021/2/15</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/W3hrSjMVJU7L44XoW9eAhQ">也说TRIM AIR：剪刀空气？剪掉什么？</a></td><td>3.知识分享</td></tr>
-		<tr name="bd" class="lf"><td>2791</td><td>硬核航空</td><td>2021/2/24</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/qX3YOwsbuhLQwncqn4JrtQ">优先活门：以保障之名，行限制之实</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="lf"><td>2792</td><td>硬核航空</td><td>2021/3/4</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/8mSt5v9dhS_KgfUee3vADA">仪表里的秘密：引气温度需要显示出来吗？</a></td><td>3.知识分享</td></tr>
-		<tr name="bi" class="lf"><td>2793</td><td>硬核航空</td><td>2021/4/3</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/wU1p4mfmBSxyCb8wJBXL0Q">使用发动机防冰，推力限制为什么减小？</a></td><td>3.知识分享</td></tr>
-		<tr name="at" class="lf"><td>2794</td><td>硬核航空</td><td>2021/5/20</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/X-_XjkNyj3tmye3d68op-w">B737NG“掉电灯”点亮的原理和处置方法</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lf"><td>2795</td><td>硬核航空</td><td>2021/5/30</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/ujrs6KLIhUf4n0Y_IZtCtA">风的温度：TAT的意义和用途</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lf"><td>2796</td><td>硬核航空</td><td>2021/7/5</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/NfxLyEKyOkgl-ieWsYYviA">导航数据库过期，可以保留吗？</a></td><td>3.知识分享</td></tr>
-		<tr name="ar" class="lc"><td>2797</td><td>宇智波机务</td><td>2021/2/16</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/oXCgwGIXl0o27tPGwyeOLQ">STAB OUT OF TRIM 灯亮故障分析</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lc"><td>2798</td><td>宇智波机务</td><td>2021/2/17</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/32F8G7DIeFL8dp1vttNRoQ">76 启动刹车组件和启动手柄</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lc"><td>2799</td><td>宇智波机务</td><td>2021/2/18</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/QRIAsAo9OLnjBlR1fHl1ug">76 启动刹车组件和启动手柄 内部电门S595失效故障分析</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lc"><td>2800</td><td>宇智波机务</td><td>2021/2/19</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/1-SLlR2oojC9D06jzeNhxQ">76 启动刹车组件和启动手柄 内部电门S1029失效故障分析</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lc"><td>2801</td><td>宇智波机务</td><td>2021/2/20</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/bpJOGCEWIKkFpk00_6tZjw">76 启动刹车组件和启动手柄 右发S1027失效故障分析（四）</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lc"><td>2802</td><td>宇智波机务</td><td>2021/2/21</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/IIGynvREMphdMlusu149Sw">76 启动刹车组件和启动手柄 内部电门左发S1024失效故障分析（五）</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lc"><td>2803</td><td>宇智波机务</td><td>2021/2/23</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/c7AdTpCSX_8A6yqHklPfTw">76 启动刹车组件和启动手柄 内部电门左发S1024失效故障分析（七）</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="lc"><td>2804</td><td>宇智波机务</td><td>2021/2/25</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/AOOiJnn8ulRLYk9pu2pYxQ">76 启动刹车组件和启动手柄 串油故障分析（八）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bi" class="la"><td>2805</td><td>宇智波机务</td><td>2021/2/26</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/Tl6q4C30-ONN_5yL8rMA7A">30 防冰活门故障分析（一）</a></td><td>1.1故障分享</td></tr>
-		<tr name="bi" class="lg"><td>2806</td><td>宇智波机务</td><td>2021/2/27</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/XHSSIPHxJIXp8SKtWdKDTA">30 发动机防冰活门简介和MEL说明（二）</a></td><td>4.MEL&放行</td></tr>
-		<tr name="bi" class="lg"><td>2807</td><td>宇智波机务</td><td>2021/3/1</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/papNyVuSu8Dhx6S0EBJdxg">30 发动机防冰活门MEL O项解释（三）</a></td><td>4.MEL&放行</td></tr>
-		<tr name="bi" class="li"><td>2808</td><td>宇智波机务</td><td>2021/3/2</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/-znKksep0XJxM8qgRh4aYA">30 发动机防冰活门灯线路介绍（四）</a></td><td>6.总结教程</td></tr>
-		<tr name="bk" class="lc"><td>2809</td><td>宇智波机务</td><td>2021/3/3</td><td>31-51 音响警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/NDJmFfOjPJ_QNfP48fQySQ">31 起落架构型警告 译码参数（一）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bk" class="lc"><td>2810</td><td>宇智波机务</td><td>2021/3/4</td><td>31-51 音响警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/oGOz2aPKtBBQr-qOo19SIA">31起落架构型警告 故障分析（二）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bk" class="lc"><td>2811</td><td>宇智波机务</td><td>2021/3/5</td><td>31-51 音响警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/4IXmw4c0szQ_tSPkVuXpAw">31起落架构型警告 故障分析（三）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bk" class="lc"><td>2812</td><td>宇智波机务</td><td>2021/3/6</td><td>31-51 音响警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/nmG2CTK2ADzj94ugIqf0Lg">31起落架构型警告 故障分析（四）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bk" class="lc"><td>2813</td><td>宇智波机务</td><td>2021/3/7</td><td>31-51 音响警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/5WRR5j-1y-Xk32tfhOnSzA">31起落架构型警告 故障分析（五）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bk" class="lc"><td>2814</td><td>宇智波机务</td><td>2021/3/8</td><td>31-51 音响警告</td><td class="title"><a href="https://mp.weixin.qq.com/s/k6atslEDhVQhz0lA_sT2Wg">31起落架构型警告 故障分析（六）</a></td><td>1.3故障分析</td></tr>
-		<tr name="an" class="la"><td>2815</td><td>宇智波机务</td><td>2021/3/15</td><td>10-00 停放系留</td><td class="title"><a href="https://mp.weixin.qq.com/s/ieapLAqm8L79KaVwHUG_CQ">10 大风天气飞机系留实例分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="at" class="la"><td>2816</td><td>宇智波机务</td><td>2021/3/17</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/b3NKj_CZhBBV3NDBWnBmew">24 SORUCE灯闪亮排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="bs" class="lc"><td>2817</td><td>宇智波机务</td><td>2021/3/18</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/xXQ4jZ7E3Tgz7Pzw6OP-2A">34 GPS信号问题737</a></td><td>1.3故障分析</td></tr>
-		<tr name="af" class="lc"><td>2818</td><td>宇智波机务</td><td>2021/3/19</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/j3Hk6_5r6EWyTJmO9-luxg">34 GPS信号问题777</a></td><td>1.3故障分析</td></tr>
-		<tr name="cm" class="lc"><td>2819</td><td>宇智波机务</td><td>2021/3/22</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/HZrCF66gZRmsjCvkUhQHsA">78 737反推故障分析分享（一）</a></td><td>1.3故障分析</td></tr>
-		<tr name="cm" class="lc"><td>2820</td><td>宇智波机务</td><td>2021/3/25</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/IvfR6Y3U5RL1dRhhpjy-Ag">78 737反推故障分享（三）</a></td><td>1.3故障分析</td></tr>
-		<tr name="cm" class="lc"><td>2821</td><td>宇智波机务</td><td>2021/3/26</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/YaZHelB7JQmaNlyzf4qCfw">78 737反推故障分析（四）</a></td><td>1.3故障分析</td></tr>
-		<tr name="cl" class="la"><td>2822</td><td>宇智波机务</td><td>2021/3/29</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/eE6XkSlvpT5W7qU2t_JF9A">80 启动活门故障分享（一）</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2823</td><td>宇智波机务</td><td>2021/3/30</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/-N4T8JGhclRldzMH-ELjJQ">80 启动活门故障分享（二）</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2824</td><td>宇智波机务</td><td>2021/3/31</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/6TLuZ3Zpgx8I-gtJ3-owhQ">80 启动活门故障分享（三）</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2825</td><td>宇智波机务</td><td>2021/4/2</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Y3bgDuqT_4IojuFS1LuFiQ">80 启动慢悬挂故障分享（四）</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="la"><td>2826</td><td>宇智波机务</td><td>2021/4/3</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/i5GWPQwmPQYj_jeOMamOtg">32 储压器压力下降快（一）</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="la"><td>2827</td><td>宇智波机务</td><td>2021/4/4</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/qrGuM-EDx7CGsPR8KcfP8w">32 PARK BARK A，B EMDP BOTH LOW PRESSURE</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="la"><td>2828</td><td>宇智波机务</td><td>2021/4/7</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/8m-7epTY1cQsKX3e7dY0TQ">27 SPEEDBRAKE DISARM灯亮新购型 快速处理（一）</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="la"><td>2829</td><td>宇智波机务</td><td>2021/4/8</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/BihWDuyk4MgjWprZUcBSEg">27 减速板预位和减速板不预位都亮故障分析（二）</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="la"><td>2830</td><td>宇智波机务</td><td>2021/4/10</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/0xVuWa0wJKl-w0Qv_U_XQQ">27 SPEEDBRAKE NO NOT ARM灯亮 之AUTOSTOW ACTUATOR（三）</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="la"><td>2831</td><td>宇智波机务</td><td>2021/4/11</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/jaliVl9hSyZIoxZq0ej8Bw">27 扰流板手柄调节（一）</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="la"><td>2832</td><td>宇智波机务</td><td>2021/4/12</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/DAyyTYOY-NqNZPcSeghxQA">27 扰流板手柄调节（二）</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="la"><td>2833</td><td>宇智波机务</td><td>2021/4/14</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/dH6y073qBpnkxruM4fhRyQ">27 扰流板手柄调节 减速板自动收回作动筒（三）</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="la"><td>2834</td><td>宇智波机务</td><td>2021/4/15</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/rGGkhpyxQTVCiCnlQ7oY4A">27 驾驶盘大角度减速板预位灯亮障分析（三）</a></td><td>1.1故障分享</td></tr>
-		<tr name="bf" class="lc"><td>2835</td><td>宇智波机务</td><td>2021/4/18</td><td>27-81 前缘襟翼缝翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/nh4LLvfCCBVyi3mdiFubNg">27 前缘过渡灯亮故障分析（一）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bf" class="lc"><td>2836</td><td>宇智波机务</td><td>2021/4/19</td><td>27-81 前缘襟翼缝翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/c1U615GPpDUCLUDFuN_GXQ">27 前缘过渡灯亮故障分析（二）</a></td><td>1.3故障分析</td></tr>
-		<tr name="ba" class="la"><td>2837</td><td>宇智波机务</td><td>2021/4/20</td><td>27-31 升降舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/9kHhrwEGM1IetsCpj4OZ_A">27 升降舵调整片锁作动筒漏油</a></td><td>1.1故障分享</td></tr>
-		<tr name="bc" class="la"><td>2838</td><td>宇智波机务</td><td>2021/4/22</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/oOQkwrtOOfQsmzEV_FTvbg">27 安定面电配平能NOSW UP不能NOSE DOWN</a></td><td>1.1故障分享</td></tr>
-		<tr name="bc" class="la"><td>2839</td><td>宇智波机务</td><td>2021/4/23</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/M-c2Kl9-nMQ80f_6xS_hnw">27 安定面电配平能NOSW UP不能NOSE DOWN(二)</a></td><td>1.1故障分享</td></tr>
-		<tr name="bd" class="lc"><td>2840</td><td>宇智波机务</td><td>2021/4/26</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/T7TmAA1GiG-ivH8eBbTPIg">27 后缘襟翼剪刀差故障分析（一）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bd" class="lc"><td>2841</td><td>宇智波机务</td><td>2021/4/28</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/pbNsI978XOM0OwoGNV3EVg">27 后缘襟翼剪刀差故障分析（二）</a></td><td>1.3故障分析</td></tr>
-		<tr name="cb" class="la"><td>2842</td><td>宇智波机务</td><td>2021/4/30</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/QZHo3cnfWwIF7KDLjg-Xag">36 左发加速慢 空中左发转速比右发大1%</a></td><td>1.1故障分享</td></tr>
-		<tr name="aq" class="la"><td>2843</td><td>宇智波机务</td><td>2021/5/1</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/NR5Ran0J_apcr9f1iwWWQw">21 空调非指令关闭（一）</a></td><td>1.1故障分享</td></tr>
-		<tr name="aq" class="la"><td>2844</td><td>宇智波机务</td><td>2021/5/2</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/K5a1Fd8x9n9aLaEo_1IVgA">21 空调非指令关闭（二）</a></td><td>1.1故障分享</td></tr>
-		<tr name="aq" class="lb"><td>2845</td><td>宇智波机务</td><td>2021/5/5</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/vmnBX-IP5i4bszzoxG9UMQ">21 按压回顾PACK亮 按压MASTER CAUTION能灭 快速处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="at" class="lg"><td>2846</td><td>宇智波机务</td><td>2021/5/6</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/3_6vZB9ECVVDBYDT-pvhjA">24 AC2电源故障导致飞机多系统故障，巧妙运用MEL放行</a></td><td>4.MEL&放行</td></tr>
-		<tr name="cf" class="la"><td>2847</td><td>宇智波机务</td><td>2021/5/8</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/g-Bf1xwZQQ22qFJkkcgcMQ">49 即使APU关了，APU FAULT灯也可能会亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="bg" class="lg"><td>2848</td><td>宇智波机务</td><td>2021/5/9</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/MuyW_uTNVg8giyXkWK1a-g">28 燃油指示器保留 M项目解读</a></td><td>4.MEL&放行</td></tr>
-		<tr name="av" class="la"><td>2849</td><td>宇智波机务</td><td>2021/5/12</td><td>26-00 防火</td><td class="title"><a href="https://mp.weixin.qq.com/s/5YNIw6lT3-r8EQrPZeIRsA">26 APU爆炸帽灯，测试不亮故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="af" class="lc"><td>2850</td><td>宇智波机务</td><td>2021/5/13</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/mgcjBnZHu9foXzjU3F08wA">27 787-9 SLATS DRIVE故障分析（787有时候代码也会抓的不准确）</a></td><td>1.3故障分析</td></tr>
-		<tr name="ba" class="ld"><td>2851</td><td>宇智波机务</td><td>2021/5/16</td><td>27-31 升降舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/wHJHt68ZgWUgHBZb3-KnTQ">27 更换升降舵皮托管经验分享</a></td><td>1.4经验总结</td></tr>
-		<tr name="cl" class="lb"><td>2852</td><td>宇智波机务</td><td>2021/5/18</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Ya_Nn2fwwSkkT9CWqOiGTQ">80 启动机打坏后一些维护建议</a></td><td>1.2故障处置</td></tr>
-		<tr name="ch" class="la"><td>2853</td><td>宇智波机务</td><td>2021/5/20</td><td>52-00 门</td><td class="title"><a href="https://mp.weixin.qq.com/s/nLXgbS4o0XGlbkev5E3LtQ">52 右机翼应急门灯亮分析</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2854</td><td>宇智波机务</td><td>2021/5/21</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/IHsPlYosF183QEHx5nNGEg">78 反推故障造成反推灯和发动机控制灯亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2855</td><td>宇智波机务</td><td>2021/5/26</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ShQyBiVMS8o31iQz3x8AfA">80 高海拔机场短停发动机热启动趋势触发EEC保护逻辑</a></td><td>1.1故障分享</td></tr>
-		<tr name="bh" class="lc"><td>2856</td><td>宇智波机务</td><td>2021/5/29</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/L3vguFi_tn_vE1s1It4Nhw">29 液压保险漏油分析及管路力矩</a></td><td>1.3故障分析</td></tr>
-		<tr name="cb" class="la"><td>2857</td><td>宇智波机务</td><td>2021/5/30</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/1zHOqdg8mZiPjKgqYIYyUg">36 引气健康测试正常 左发引气压力低排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cb" class="la"><td>2858</td><td>宇智波机务</td><td>2021/6/2</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/-4pAebC9t8ciVyH8FwJ4sQ">36 引气压力低 温度正常 排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cb" class="la"><td>2859</td><td>宇智波机务</td><td>2021/6/5</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/Vtx8PLa-H-gURe42YmBiGQ">36 引气压力0 重新开关BLD电门后正常故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="lg"><td>2860</td><td>宇智波机务</td><td>2021/6/6</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/0I-z6wBY2QkiB6LHVoPGIw">73 ENG VALVE CLOSED指示故障 MEL项目解读</a></td><td>4.MEL&放行</td></tr>
-		<tr name="cl" class="la"><td>2861</td><td>宇智波机务</td><td>2021/6/10</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/AZ68b-GsaKq2Vtl-3mxhQQ">21 N1起飞推力不一致</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="la"><td>2862</td><td>宇智波机务</td><td>2021/6/12</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/QzBIYQXKwuISCs57t2_qHw">32 起落架放下后三红和三绿灯同时亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="ba" class="la"><td>2863</td><td>宇智波机务</td><td>2021/6/14</td><td>27-31 升降舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/mSOD7b89k14ShF30cl5GkQ">27 升降舵感觉压差灯亮排故</a></td><td>1.1故障分享</td></tr>
-		<tr name="aq" class="la"><td>2864</td><td>宇智波机务</td><td>2021/6/19</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/EjXN_glRn4McGU1WFYx34w">21 右空调关闭右PACK跳开灯亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="aq" class="la"><td>2865</td><td>宇智波机务</td><td>2021/6/23</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/Vnf3ONjxFnwuDXy0QAOTiQ">21 DUCT OVERHEAT和FSCOV关闭位置PACK灯亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2866</td><td>宇智波机务</td><td>2021/6/29</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/PgeY9LeJ5JowPjcKgOHmlw">72 左发4级LPT叶冠配平片松动</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2867</td><td>宇智波机务</td><td>2021/7/3</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/W8LiVq_fP-N1E5AvtqotEA">79 落地滑油旁通灯亮故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2868</td><td>宇智波机务</td><td>2021/7/7</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/cVfA_L5GOxYNHdNWz5xUkg">73 燃油滤旁通灯亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="aq" class="la"><td>2869</td><td>宇智波机务</td><td>2021/7/13</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/hkzURKX_3btN2LbTriWMkg">21 下降时监控到右PACK关闭 排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="li"><td>2870</td><td>宇智波机务</td><td>2021/7/16</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/yboct9e2fjAsnEdg-ayUJA">31 PSEU如何正确读取起飞构型警告代码</a></td><td>6.总结教程</td></tr>
-		<tr name="aq" class="la"><td>2871</td><td>宇智波机务</td><td>2021/7/20</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/XUWjOlqCpMu6bl0FwHxPxg">21 巡航时爬升率表头正负300波动</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="lc"><td>2872</td><td>宇智波机务</td><td>2021/7/24</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Deb16d1oqbajjbcQjkZ41A">76 启动刹车组件和启动手柄 内部电门左发S1024失效故障分析 ENG FAIL（七）</a></td><td>1.3故障分析</td></tr>
-		<tr name="bx" class="la"><td>2873</td><td>宇智波机务</td><td>2021/7/29</td><td>34-53 ATC</td><td class="title"><a href="https://mp.weixin.qq.com/s/u7hQBrO5ilGOguWlMQ9A5A">34 航空器编码S模式排故</a></td><td>1.1故障分享</td></tr>
-		<tr name="bd" class="la"><td>2874</td><td>宇智波机务</td><td>2021/7/31</td><td>27-51 后缘襟翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/0LtZOpRmXmM11QClhvo7ig">27 后缘襟翼不对称 排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2875</td><td>宇智波机务</td><td>2021/8/5</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/MvF2yPSBDwqpohBaXtWNEQ">71 发动机尾喷有火</a></td><td>1.1故障分享</td></tr>
-		<tr name="at" class="la"><td>2876</td><td>宇智波机务</td><td>2021/8/8</td><td>24-00 电源</td><td class="title"><a href="https://mp.weixin.qq.com/s/Ra0MgVuDZNFvcmMKU4hy0w">24 空中右TRASFER BUS OFF闪亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="la"><td>2877</td><td>宇智波机务</td><td>2021/8/10</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/ihor7mDbQ7QL5EzEJuOxDQ">33 灯光测试P2-2面板灯不亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2878</td><td>宇智波机务</td><td>2021/8/13</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/rdisnhTS0PIo8PcMlr5S5A">75 右发75-30452 VBV信号不一致 （VBV PAD丢失）排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="bs" class="la"><td>2879</td><td>宇智波机务</td><td>2021/8/17</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/aBPpdfrHG8-y5fi8MH3rCw">34 右侧航向道截获不识别 排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="li"><td>2880</td><td>宇智波机务</td><td>2021/8/22</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/r5kOp5GGU1hQCaRzQkMBIA">73 发动机备用方式灯亮</a></td><td>6.总结教程</td></tr>
-		<tr name="af" class="la"><td>2881</td><td>宇智波机务</td><td>2021/8/25</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/JcLA5NwuuCGxyhAckFD4Cg">21 B787 RAM FAN R保留后 双发启动不成功</a></td><td>1.1故障分享</td></tr>
-		<tr name="af" class="lg"><td>2882</td><td>宇智波机务</td><td>2021/8/30</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/onFD0VVmXOgzbMBFvtRmIA">32 787 刹车EBA保留故障分享</a></td><td>4.MEL&放行</td></tr>
-		<tr name="ar" class="la"><td>2883</td><td>宇智波机务</td><td>2021/9/3</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/75qaAn3CzYnWnXHuSDPzGQ">22 IFSAU故障导致 N多故障分析分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2884</td><td>宇智波机务</td><td>2021/9/6</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/q5pkXNuv7BsnyDF0k7eOmg">21 左右发起飞推力限制不一致故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="ar" class="la"><td>2885</td><td>宇智波机务</td><td>2021/9/10</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/MHOrEv-wgzsYUDPNjGEYzA">22 AP A接不通故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2886</td><td>宇智波机务</td><td>2021/9/13</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/yADadNw-awFOx6K7rz7-mg">76 启动刹车组件 内部S1026（ FUEL HPSOV）电门故障 导致关车慢故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="ar" class="la"><td>2887</td><td>宇智波机务</td><td>2021/9/18</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/tRMsmobAuGTZbuA3QIb5OA">22 偏航阻尼YAW DMPER 空中偶尔接不通故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="ch" class="li"><td>2888</td><td>宇智波机务</td><td>2021/9/22</td><td>52-00 门</td><td class="title"><a href="https://mp.weixin.qq.com/s/Us0U3pOiPOjb9JUs2WT-HA">52 机翼应急门灯亮介绍</a></td><td>6.总结教程</td></tr>
-		<tr name="cj" class="ld"><td>2889</td><td>宇智波机务</td><td>2021/9/27</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/M_juGddJFVkXVNYxziEY7w">56 2号活动窗调节经验分享</a></td><td>1.4经验总结</td></tr>
-		<tr name="af" class="ld"><td>2890</td><td>宇智波机务</td><td>2021/9/30</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ekky2TBVd_u2TCzjcz-wnw">787 更换GPM经验分享</a></td><td>1.4经验总结</td></tr>
-		<tr name="cl" class="la"><td>2891</td><td>宇智波机务</td><td>2021/10/8</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/QD19ThgieBAHjAcPHfTaVg">73 提前发现发动机控制灯亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>2892</td><td>宇智波机务</td><td>2021/10/12</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/KEk3kYu9vFeV9wT_K6UZbA">72 发动机识别塞 ID PLUG 故障分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="li"><td>2893</td><td>宇智波机务</td><td>2021/10/16</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/onwzzRCvdzbYzedFrMGdkw">32 停留刹车关断活门介绍</a></td><td>6.总结教程</td></tr>
-		<tr name="cm" class="la"><td>2894</td><td>宇智波机务</td><td>2021/10/17</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/cg7QF3jpO5eFvWlhiRlLOg">78 反推故障分享（二） 反推收的慢</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="lg"><td>2895</td><td>宇智波机务</td><td>2021/10/21</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/z83hg6il3a3k5aQaC5AHHg">32 自动刹车不预位灯亮 M项软管和堵头的查找方法分享</a></td><td>4.MEL&放行</td></tr>
-		<tr name="az" class="la"><td>2896</td><td>宇智波机务</td><td>2021/10/24</td><td>27-21 方向舵</td><td class="title"><a href="https://mp.weixin.qq.com/s/QVlY_51Z7_J2fvxzyH4eNw">27 B系统低压灯亮 备用方向舵灯亮 排故分享</a></td><td>1.1故障分享</td></tr>
-		<tr name="ah" class="lf"><td>2897</td><td>硬核航空</td><td>2020/11/30</td><td>H.冬季运行</td><td class="title"><a href="https://mp.weixin.qq.com/s/iAO22QUycBj7qEoG6RoYUw">如何查询除防冰液保持时间</a></td><td>3.知识分享</td></tr>
-
-
-      </table>
-      <div id=updatedTime>更新日期：2021年11月15日</div>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-</html>
-<a href="https://mp.weixin.qq.com/s/scHg4wjwfzZ3hTsISBjODA">维护提示 | 发动机未运转，“DRIVE”灯不亮</a></td><td>5.维护提示</td></tr>
-		<tr name="bv" class="lf"><td>1625</td><td>阮工频道</td><td>2019/9/17</td><td>34-45 TCAS</td><td class="title"><a href="https://mp.weixin.qq.com/s/MyBL-qrbmju8AlMqrDqplA">TCAS：空中防撞的最后一道防线</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lh"><td>1626</td><td>阮工频道</td><td>2019/9/19</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/V6R4lvA0oTKKCn9u_C6MIA">固定式ELT介绍及意外发射后的处理</a></td><td>5.维护提示</td></tr>
-		<tr name="bp" class="lc"><td>1627</td><td>阮工频道</td><td>2019/9/22</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/eDGMbQzsL07k2x7l-dQCXA">关于惯导位置偏差的问题</a></td><td>1.3故障分析</td></tr>
-		<tr name="ao" class="lh"><td>1628</td><td>阮工频道</td><td>2019/9/24</td><td>12-00 勤务</td><td class="title"><a href="https://mp.weixin.qq.com/s/oEHKSOPZkXEzbXSD46TpsA">维护提示 | 滑油系统勤务时避免加油过量</a></td><td>5.维护提示</td></tr>
-		<tr name="cf" class="lf"><td>1629</td><td>阮工频道</td><td>2019/9/25</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/ylOTPMP1yaViRkI-Go8PLw">APU故障代码读取，你真的会吗？</a></td><td>3.知识分享</td></tr>
-		<tr name="bs" class="lf"><td>1630</td><td>阮工频道</td><td>2019/9/26</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/DgXFNzlq2f6TkgjUuytjyw">关于GPS信号干扰</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1631</td><td>阮工频道</td><td>2019/9/27</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/KQSRTM8AW1ActFheAF4zhA">737NG和A320飞机360度全景轮舱部件识别图</a></td><td>3.知识分享</td></tr>
-		<tr name="ci" class="lf"><td>1632</td><td>阮工频道</td><td>2019/10/4</td><td>53-00 机身</td><td class="title"><a href="https://mp.weixin.qq.com/s/9vXv3Rl5vTLiUlNcXgXlYQ">针对737NG客改货中机身部件发现裂纹，FAA发布重复检查AD</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="li"><td>1633</td><td>阮工频道</td><td>2019/10/8</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/wLvjmp6s6WYCTbgl_zSnuA">基础知识 | 飞机管路分类与标识</a></td><td>6.总结教程</td></tr>
-		<tr name="ac" class="li"><td>1634</td><td>阮工频道</td><td>2019/10/18</td><td>C.手册使用</td><td class="title"><a href="https://mp.weixin.qq.com/s/tCe7GW3O2xBDHFoCblKDUQ">用一个实例，了解线路图手册使用</a></td><td>6.总结教程</td></tr>
-		<tr name="cl" class="la"><td>1635</td><td>阮工频道</td><td>2019/10/21</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/dl0bM9d3lK_1aX12fpsNvQ">案例分享 | 发动机振动值高</a></td><td>1.1故障分享</td></tr>
-		<tr name="be" class="lh"><td>1636</td><td>阮工频道</td><td>2019/10/26</td><td>27-61 扰流板</td><td class="title"><a href="https://mp.weixin.qq.com/s/v4YswWmDJ1WajeijrKyJuw">维护提示 | DU上扰流板位置指示</a></td><td>5.维护提示</td></tr>
-		<tr name="au" class="lf"><td>1637</td><td>阮工频道</td><td>2019/10/29</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/tfOIumBHApGdL6auAJOI-g">关于应急门出口位置的座椅小桌板搭扣打开的方向</a></td><td>3.知识分享</td></tr>
-		<tr name="cm" class="lh"><td>1638</td><td>阮工频道</td><td>2019/10/31</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZzKbENNCzBWlYgpEvE8pIQ">维护提示 | 警惕737NG反推开锁手柄标靶导致的反推故障，附带测试工具的使用视频</a></td><td>5.维护提示</td></tr>
-		<tr name="cl" class="lh"><td>1639</td><td>阮工频道</td><td>2019/11/5</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/J4FA1_1dtIBEDusFoR5g8g">维护提示 | CFM56-7B尾喷管内有滑油渗漏</a></td><td>5.维护提示</td></tr>
-		<tr name="cm" class="lh"><td>1640</td><td>阮工频道</td><td>2019/11/7</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/-Qs03wOOYpV4lOgkraoAgQ">维护提示 | 737NG反推上部锁作动筒完整性测试后导致反推灯亮的风险</a></td><td>5.维护提示</td></tr>
-		<tr name="as" class="lg"><td>1641</td><td>阮工频道</td><td>2019/11/10</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/CSmbm09d6r54g_U9X3PoMw">维护提示 | 737NG无线电调谐面板与VHF通讯控制面板的区别</a></td><td>4.MEL&放行</td></tr>
-		<tr name="bm" class="li"><td>1642</td><td>阮工频道</td><td>2019/11/18</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/dNCW9PL9nuOn12dRHsl09g">一张图说明737-800应急灯分布</a></td><td>6.总结教程</td></tr>
-		<tr name="bm" class="lb"><td>1643</td><td>阮工频道</td><td>2019/11/20</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/wObIeEvucsH36nLgtS1LLQ">737NG应急灯常见故障与处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="ai" class="lb"><td>1644</td><td>阮工频道</td><td>2019/11/24</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/Fv07aSUBkgpVRfVwlxTqfw">737NG飞机冬季常见问题与处理</a></td><td>1.2故障处置</td></tr>
-		<tr name="bh" class="lh"><td>1645</td><td>阮工频道</td><td>2019/11/28</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/6B5Jr8PELWdUi5MigqORjg">维护提示 | 新旧两种构型液压A/B系统回油滤的差异</a></td><td>5.维护提示</td></tr>
-		<tr name="ap" class="lf"><td>1646</td><td>阮工频道</td><td>2019/12/3</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/WRSrav_VPQot-3-93_HLww">关于螺栓螺母拧紧名词术语的说明</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lj"><td>1647</td><td>阮工频道</td><td>2019/12/8</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/xinPoHVhzkYxFc-ZhpzhzA">A320 CBT @01电子仪表系统说明</a></td><td>7.视频资料</td></tr>
-		<tr name="ag" class="lj"><td>1648</td><td>阮工频道</td><td>2019/12/9</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Ja_7TcoyEBBHfSfrjJHaug">A320 CBT @02 ECAM系统描述（1）</a></td><td>7.视频资料</td></tr>
-		<tr name="ap" class="ll"><td>1649</td><td>阮工频道</td><td>2019/12/15</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/-5wiE2OPCKtpjtqpV7S_Ww">案例分享 | 737NG 571BB/671BB盖板螺钉力矩查询</a></td><td>8.2力矩查询</td></tr>
-		<tr name="ag" class="lj"><td>1650</td><td>阮工频道</td><td>2019/12/17</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/fDvVfbVuvWwLLQCkUKheLg">A320 CBT @02 ECAM系统描述（2）</a></td><td>7.视频资料</td></tr>
-		<tr name="cb" class="lh"><td>1651</td><td>阮工频道</td><td>2019/12/18</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/zFywIdyv6eztSB_sHIO4Uw">维护提示 | 引气调节器供气压力传感管破裂导致全程引气压力低/无引气</a></td><td>5.维护提示</td></tr>
-		<tr name="ag" class="lj"><td>1652</td><td>阮工频道</td><td>2019/12/22</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/RqMzmo6oJ5KZPxKgl7S2kA">A320 CBT @04 ECAM正常操作</a></td><td>7.视频资料</td></tr>
-		<tr name="ap" class="li"><td>1653</td><td>阮工频道</td><td>2019/12/25</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/bLWNwWPHpOWKZ6-13stubA">基础知识 | 飞机上常用的防咬油</a></td><td>6.总结教程</td></tr>
-		<tr name="cm" class="lh"><td>1654</td><td>阮工频道</td><td>2019/12/26</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/Kdndmp0I7AxxlnKxei8lTw">维护视频 | 737NG反推锁作动筒完整性测试</a></td><td>5.维护提示</td></tr>
-		<tr name="ai" class="lf"><td>1655</td><td>阮工频道</td><td>2019/12/31</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/rOvqqSvmq2z9d28WLiVIJQ">关于机组手册和机务手册部分内容差异的说明</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lh"><td>1656</td><td>阮工频道</td><td>2020/1/2</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/WAr3lhgm6EWvdCfPeETDBQ">维护提示 | 737NG碳刹车作动筒漏油</a></td><td>5.维护提示</td></tr>
-		<tr name="ap" class="lk"><td>1657</td><td>阮工频道</td><td>2020/1/3</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/iPqbHs63GXIBz47oa0l56A">案例分享 | 盖板螺钉件号查询</a></td><td>8.1件号查询</td></tr>
-		<tr name="cl" class="lh"><td>1658</td><td>阮工频道</td><td>2020/1/4</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/JLzqPDevGW6YzOt-kXLFQw">维护提示 | 737NG发动机起动活门无法打开</a></td><td>5.维护提示</td></tr>
-		<tr name="cm" class="lj"><td>1659</td><td>阮工频道</td><td>2020/1/5</td><td>78-34 反推</td><td class="title"><a href="https://mp.weixin.qq.com/s/cMpckOqFYzoJ2R0ZtZeXCw">737NG使用反推倒出机位然后滑走</a></td><td>7.视频资料</td></tr>
-		<tr name="ah" class="lh"><td>1660</td><td>阮工频道</td><td>2020/1/6</td><td>H.冬季运行</td><td class="title"><a href="https://mp.weixin.qq.com/s/WfeOUtUrDVO81UisW7AOqQ">维护提示 | 除防冰时垂尾盖板锁扣被水柱冲开</a></td><td>5.维护提示</td></tr>
-		<tr name="ag" class="lj"><td>1661</td><td>阮工频道</td><td>2020/1/7</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/75hhF4mYad13QYE84BcSdA">A320 CBT @05 ECAM正常操作②</a></td><td>7.视频资料</td></tr>
-		<tr name="bp" class="la"><td>1662</td><td>阮工频道</td><td>2020/1/10</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/CtQi7TQaD7Tz8YfG0wxjbg">案例分享 | 右惯导DC FAIL灯亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="bi" class="lf"><td>1663</td><td>阮工频道</td><td>2020/1/12</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/L6nTFkX-NmHSY8FGSBeLpA">关于地面发动机关车、未超控PRSOV反流时少数飞机发动机防冰ON位活门能打开的说明</a></td><td>3.知识分享</td></tr>
-		<tr name="bl" class="lf"><td>1664</td><td>阮工频道</td><td>2020/1/13</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/XNmK6Trhf8leO1eJC0Ymgw">聊一聊737NG的老寒腿问题：从严寒地区起飞落地后前起镜面到底</a></td><td>3.知识分享</td></tr>
-		<tr name="bp" class="lm"><td>1665</td><td>阮工频道</td><td>2020/1/14</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/_gOrMKapakpXj7hY8idHpQ">关于左右惯导允许的航向偏差范围的说明</a></td><td>8.3标准查询</td></tr>
-		<tr name="bl" class="lf"><td>1666</td><td>阮工频道</td><td>2020/1/15</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/1OSSWos3iA8iJ6yh58GKCA">安全停机</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="la"><td>1667</td><td>阮工频道</td><td>2020/1/16</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/YN4I7EkPZ35rD62tO3wOYA">案例分享 | 双发N1相同时油门杆不齐，人工对齐油门杆双发N1有差值</a></td><td>1.1故障分享</td></tr>
-		<tr name="ag" class="lj"><td>1668</td><td>阮工频道</td><td>2020/1/17</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/7LIklcryxPfQ4BXgvXCKbg">A320 CBT @06 主飞行显示①</a></td><td>7.视频资料</td></tr>
-		<tr name="bp" class="lb"><td>1669</td><td>阮工频道</td><td>2020/1/18</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/q6E7hs_1_zt9uNSDnsq_6Q">操作提示 | 地面发动机起动后显示高TAT温度</a></td><td>1.2故障处置</td></tr>
-		<tr name="bl" class="lh"><td>1670</td><td>阮工频道</td><td>2020/1/21</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/EupBrFYfrp5HqUpyqSotKQ">维护提示 | 737NG备用刹车选择活门更换及渗漏测试</a></td><td>5.维护提示</td></tr>
-		<tr name="ap" class="ll"><td>1671</td><td>阮工频道</td><td>2020/1/22</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/mhSoI-PbwPimw7A1KfsS1w">案例分享 | 更换备用刹车选择活门管路和接头的标准力矩查找</a></td><td>8.2力矩查询</td></tr>
-		<tr name="aq" class="lf"><td>1672</td><td>阮工频道</td><td>2020/1/25</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/v2yvzN4ZNi_D1OgqOHw3jg">关于再循环空气滤与2019-NCOV</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="lk"><td>1673</td><td>阮工频道</td><td>2020/2/10</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/MdY84dTWz-EXF-ZCQImjQQ">案例分享 | 液压系统维护时管路接头堵头的件号和使用</a></td><td>8.1件号查询</td></tr>
-		<tr name="ag" class="lj"><td>1674</td><td>阮工频道</td><td>2020/2/11</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/bHbLpuuJxzUZyjNDFgnh9g">A320 CBT @07 主飞行显示②</a></td><td>7.视频资料</td></tr>
-		<tr name="bl" class="li"><td>1675</td><td>阮工频道</td><td>2020/2/12</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/VGfLe-upKvZEEZeze_IVZw">基础知识 | 油气式起落架减震支柱的工作原理</a></td><td>6.总结教程</td></tr>
-		<tr name="ag" class="lj"><td>1676</td><td>阮工频道</td><td>2020/2/15</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/uToT3KeB3j9R-lTxxnSKQg">A320 CBT @08 导航显示</a></td><td>7.视频资料</td></tr>
-		<tr name="bs" class="li"><td>1677</td><td>阮工频道</td><td>2020/2/16</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/i1LIQyunjmgPkYU7hdKEeg">基础知识 | 仪表着陆系统</a></td><td>6.总结教程</td></tr>
-		<tr name="ap" class="li"><td>1678</td><td>阮工频道</td><td>2020/2/19</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/k1BaOyER33KFXFxmOCq6Ng">基础知识 | 飞机上的密封圈</a></td><td>6.总结教程</td></tr>
-		<tr name="bm" class="lh"><td>1679</td><td>阮工频道</td><td>2020/2/20</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/Vj2Qv4IP9OBsUzy4S7rVEA">维护提示 | 长时间断电停场飞机应急灯电池故障</a></td><td>5.维护提示</td></tr>
-		<tr name="bm" class="lf"><td>1680</td><td>阮工频道</td><td>2020/2/21</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/eEoNPOS42RJbFXW76UDFLQ">这个平时不亮的灯，经常被误认为是应急灯</a></td><td>3.知识分享</td></tr>
-		<tr name="bm" class="lh"><td>1681</td><td>阮工频道</td><td>2020/2/22</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/tR4Sk-ov4mJi7XN0OjMlhw">一个被遗忘的应急灯</a></td><td>5.维护提示</td></tr>
-		<tr name="bl" class="lf"><td>1682</td><td>阮工频道</td><td>2020/2/24</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/nusShyHUvPitdvUw9zJe-w">737NG有哪些系统会受空地信号影响？</a></td><td>3.知识分享</td></tr>
-		<tr name="ac" class="li"><td>1683</td><td>阮工频道</td><td>2020/2/25</td><td>C.手册使用</td><td class="title"><a href="https://mp.weixin.qq.com/s/4sX5uzOyfC-sPIdPxEUcQA">常见手册问题之AMM</a></td><td>6.总结教程</td></tr>
-		<tr name="ca" class="lh"><td>1684</td><td>阮工频道</td><td>2020/2/26</td><td>35-00 氧气</td><td class="title"><a href="https://mp.weixin.qq.com/s/kyuDmSNThlq7osDJyQwjGA">维护提示 | 关于机组氧气面罩的差异</a></td><td>5.维护提示</td></tr>
-		<tr name="ac" class="li"><td>1685</td><td>阮工频道</td><td>2020/2/27</td><td>C.手册使用</td><td class="title"><a href="https://mp.weixin.qq.com/s/JfAJ_OIAQGjvVqYRP7-Alg">常见手册问题之IPC</a></td><td>6.总结教程</td></tr>
-		<tr name="cl" class="lf"><td>1686</td><td>阮工频道</td><td>2020/2/28</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/yIoQH4cUzVdfDzOg0fFVLw">CFM56-7仿真虚拟教学软件</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="lf"><td>1687</td><td>阮工频道</td><td>2020/2/29</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/w1R_Xk2ZJfsXlfi_23Wy-g">管路连接端的螺母为什么叫B-NUT？</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="lf"><td>1688</td><td>阮工频道</td><td>2020/3/2</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/KLpaD38xo0Ox4r8PvqfPAg">都是管子，PIPE/TUBE/DUCT/HOSE/CONDUIT/LINE有什么区别？</a></td><td>3.知识分享</td></tr>
-		<tr name="cl" class="li"><td>1689</td><td>阮工频道</td><td>2020/3/3</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZAcR0q81U-_Ahkhut2LNcg">EEC的三种慢车控制模式</a></td><td>6.总结教程</td></tr>
-		<tr name="bx" class="lf"><td>1690</td><td>阮工频道</td><td>2020/3/3</td><td>34-53 ATC</td><td class="title"><a href="https://mp.weixin.qq.com/s/swPMZO2CCZ87Bj6MAvAEEg">ADS-B | 你真的懂吗？</a></td><td>3.知识分享</td></tr>
-		<tr name="bx" class="lf"><td>1691</td><td>阮工频道</td><td>2020/3/3</td><td>34-53 ATC</td><td class="title"><a href="https://mp.weixin.qq.com/s/4FaqTS9jsD7vPiqvpP6sqw">ADS-B | 一些想和你探讨的问题</a></td><td>3.知识分享</td></tr>
-		<tr name="ac" class="li"><td>1692</td><td>阮工频道</td><td>2020/3/4</td><td>C.手册使用</td><td class="title"><a href="https://mp.weixin.qq.com/s/sstscl_yDN9Hr8G_34os5A">如何识读原理图？</a></td><td>6.总结教程</td></tr>
-		<tr name="bi" class="li"><td>1693</td><td>阮工频道</td><td>2020/3/5</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/JmgBTEBiBw60yL-SD29-zg">开始尝试识读原理图：COWL VALVE OPEN 灯</a></td><td>6.总结教程</td></tr>
-		<tr name="ag" class="lf"><td>1694</td><td>阮工频道</td><td>2020/3/7</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/fElL13ETs0KAZsvfK5P8BQ">防止A320系列飞机油箱燃油溢出</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1695</td><td>阮工频道</td><td>2020/3/12</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/C0m_kCScfCPTLk7Vph9IqA">推荐一些我平时看的英文网站，其实学习很简单</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1696</td><td>阮工频道</td><td>2020/3/14</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/9NQBFfN3e6jsGjnVg7slIQ">基础知识 | 日期时间的识别</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lf"><td>1697</td><td>阮工频道</td><td>2020/3/20</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/A8vYRPZL4sfzl2vOsvYUzQ">推荐一个好用免费好用的A320 ECAM培训工具</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="lg"><td>1698</td><td>阮工频道</td><td>2020/3/21</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/hD8wSxMw2QIDiEpAqc9KGA">这2个引气系统MEL项，你能理解吗？</a></td><td>4.MEL&放行</td></tr>
-		<tr name="aq" class="li"><td>1699</td><td>阮工频道</td><td>2020/3/22</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/DmjZRnXr89u3we-HRo-p1w">资料分享 | 737-800和A320空调系统培训手册</a></td><td>6.总结教程</td></tr>
-		<tr name="aq" class="la"><td>1700</td><td>阮工频道</td><td>2020/3/24</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/AqdVZZib-WzYCzbe9VEGqg">案例分享 | 左发引气保留后客舱释压</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="lb"><td>1701</td><td>阮工频道</td><td>2020/3/26</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/tIfiVU1LThtohZ7TCC7gQA">前起被风吹偏超过角度后该怎么办？</a></td><td>1.2故障处置</td></tr>
-		<tr name="aq" class="lg"><td>1702</td><td>阮工频道</td><td>2020/3/28</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/_AUHGmVZ2UHQZRc6PBDbHg">MEL 36-01：隔离活门失效在关位后，为什么要限制飞机不在结冰条件下飞行？我的答案</a></td><td>4.MEL&放行</td></tr>
-		<tr name="cl" class="lj"><td>1703</td><td>阮工频道</td><td>2020/3/31</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/Oa3iV88by_T1l5IrYBCQUw">CFM56-7B和LEAP-1A 发动机封存视频</a></td><td>7.视频资料</td></tr>
-		<tr name="cl" class="lj"><td>1704</td><td>阮工频道</td><td>2020/4/1</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/gRGMubnlZZwEwRXqK0Ld3g">CFM56-5A/5B和CF6-80C2/80E1 发动机封存视频</a></td><td>7.视频资料</td></tr>
-		<tr name="aq" class="lf"><td>1705</td><td>阮工频道</td><td>2020/4/6</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/qSqKFD_iJj5Ss2nJrlRa_Q">MEL 36-05-02 为什么要用右发引气带左空调？</a></td><td>3.知识分享</td></tr>
-		<tr name="bi" class="lg"><td>1706</td><td>阮工频道</td><td>2020/4/11</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/vpsJhI0zwRapDlhrE9VjGA">MEL 30-11 中提到的风挡除雾系统在哪里？</a></td><td>4.MEL&放行</td></tr>
-		<tr name="ap" class="lk"><td>1707</td><td>阮工频道</td><td>2020/4/12</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/-54ltJ7PXFZ8129nZ5wtuA">卡箍的力矩怎么找？卡箍上没有标</a></td><td>8.1件号查询</td></tr>
-		<tr name="ad" class="ld"><td>1708</td><td>阮工频道</td><td>2020/4/16</td><td>D.SWPM</td><td class="title"><a href="https://mp.weixin.qq.com/s/SsSlb4BzdFo_CY9A1Mdccg">737NG 克鲁格襟翼上的搭地线小结</a></td><td>1.4经验总结</td></tr>
-		<tr name="af" class="li"><td>1709</td><td>阮工频道</td><td>2020/4/18</td><td>F.787等宽体机</td><td class="title"><a href="https://mp.weixin.qq.com/s/aiBmJMjkrE_T-qiD13PF0Q">波音787复合材料修理简介</a></td><td>6.总结教程</td></tr>
-		<tr name="ai" class="lf"><td>1710</td><td>阮工频道</td><td>2020/4/18</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/sI-ImrxCinfpQGk6sNDiCQ">推荐一个小程序：737NG和A320驾驶舱面板介绍</a></td><td>3.知识分享</td></tr>
-		<tr name="cf" class="lh"><td>1711</td><td>阮工频道</td><td>2020/4/20</td><td>49-00 APU</td><td class="title"><a href="https://mp.weixin.qq.com/s/3-AD3MtvxElxbYYBt3Em-w">维护提示 | 737NG APU滑油滤压差指示器弹出</a></td><td>5.维护提示</td></tr>
-		<tr name="an" class="lf"><td>1712</td><td>阮工频道</td><td>2020/4/20</td><td>10-00 停放系留</td><td class="title"><a href="https://mp.weixin.qq.com/s/sHCAnJWDlpqBXluAIwxInw">关于飞机正确停放和存放的安全提醒</a></td><td>3.知识分享</td></tr>
-		<tr name="bu" class="lf"><td>1713</td><td>阮工频道</td><td>2020/4/21</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/7C4c8Zv4sVXR7ZTfipUYwQ">气象雷达的最佳使用</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="li"><td>1714</td><td>阮工频道</td><td>2020/4/22</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/Eh9XoHspG4-nqEiXOk05Tg">资料分享 | 737NG机型概述PPT课件</a></td><td>6.总结教程</td></tr>
-		<tr name="bm" class="la"><td>1715</td><td>阮工频道</td><td>2020/4/23</td><td>33-00 灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/XhH4zMEk7ZKrjsi5dGpU1Q">案例分享 | ACP软件错误导致厨房顶灯无法关闭</a></td><td>1.1故障分享</td></tr>
-		<tr name="as" class="lf"><td>1716</td><td>阮工频道</td><td>2020/4/24</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/MOaT7hNYzdK73AaFnNAqrw">SATCOM：卫星电话使用说明</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1717</td><td>阮工频道</td><td>2020/4/25</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/j3sQ8dgMGPpJRw5ZdlGK7Q">资料分享 | 737CL 系统原理彩图</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lf"><td>1718</td><td>阮工频道</td><td>2020/4/26</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/iMwmItT2Sc1br6Z_hd6Rug">资料分享 | A320系列飞机系统简图</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1719</td><td>阮工频道</td><td>2020/4/27</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/QdCTfFtHcQM74cI4cUgh7Q">资料分享 | 737NG飞机系统简图</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="lf"><td>1720</td><td>阮工频道</td><td>2020/4/28</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/Rng7-3nvTxyRNavXVoe6SA">关于空调主级散热器上金属垫圈的说明</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1721</td><td>阮工频道</td><td>2020/5/5</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/-UsDrUyUws9gR30A55oeoA">波音737-89P，737-86D，737-86N等一系列型号是什么意思？</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1722</td><td>阮工频道</td><td>2020/5/6</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/m7CkUjoKJ1MlwCQYGiFrFQ">视频：机长讲解737NG驾驶舱准备到起飞</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1723</td><td>阮工频道</td><td>2020/5/7</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/rFgawO-Sr2ld7VbrDWULYw">视频：737NG 飞行前机组驾驶舱都要做哪些测试？</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="li"><td>1724</td><td>阮工频道</td><td>2020/5/8</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/DQ1sy5e8K92wJT5NHMv9oQ">看了那么多文章还是搞不懂空调温度控制原理？赶紧来洗个澡呀！</a></td><td>6.总结教程</td></tr>
-		<tr name="ag" class="li"><td>1725</td><td>阮工频道</td><td>2020/5/9</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/FwrTYe1kM9FdLMOuUvCBhg">A320系列全套学习资料分享</a></td><td>6.总结教程</td></tr>
-		<tr name="aq" class="lb"><td>1726</td><td>阮工频道</td><td>2020/5/10</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/mls8NFYHttbEUMIyLpdVJQ">需要复位电源才能清除的PACK/ZONE TEMP灯亮故障</a></td><td>1.2故障处置</td></tr>
-		<tr name="ai" class="lg"><td>1727</td><td>阮工频道</td><td>2020/5/11</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/RFuW6XoXk20Viuiwd9Ucfw">正确使用MEL</a></td><td>4.MEL&放行</td></tr>
-		<tr name="bf" class="la"><td>1728</td><td>阮工频道</td><td>2020/5/12</td><td>27-81 前缘襟翼缝翼</td><td class="title"><a href="https://mp.weixin.qq.com/s/iI41xzV4nNM1W5HhbeFiXw">案例分享 | 737NG前缘3号缝翼过渡灯亮</a></td><td>1.1故障分享</td></tr>
-		<tr name="bp" class="li"><td>1729</td><td>阮工频道</td><td>2020/5/14</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/5AAWt1kIwAkk84xA86B7IA">B737NG飞机 ADIRU维护与排故提示</a></td><td>6.总结教程</td></tr>
-		<tr name="ai" class="lb"><td>1730</td><td>阮工频道</td><td>2020/5/15</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/9WF3kEyBPKrURutyHaG6vw">737NG 常见需要复位跳开关的故障</a></td><td>1.2故障处置</td></tr>
-		<tr name="ai" class="lf"><td>1731</td><td>阮工频道</td><td>2020/5/16</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/IAT5umetuXpzkDMiXqDX5w">成为更有价值技术人员指南</a></td><td>3.知识分享</td></tr>
-		<tr name="ab" class="li"><td>1732</td><td>阮工频道</td><td>2020/5/17</td><td>B.Boeing网站</td><td class="title"><a href="https://mp.weixin.qq.com/s/hQrACK-Qdj7QeYD8VuuZrw">波音耗材查询</a></td><td>6.总结教程</td></tr>
-		<tr name="ag" class="lj"><td>1733</td><td>阮工频道</td><td>2020/5/17</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/T-gPhjtUkm5tXp1N6x0Ikg">A320发动机整流罩打开和关闭</a></td><td>7.视频资料</td></tr>
-		<tr name="cl" class="lh"><td>1734</td><td>阮工频道</td><td>2020/5/18</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/3mmX4FUKl29kyVtwDxWNww">维护提示 | 发动机防冰活门搭地线接线片断裂导致机匣磨损</a></td><td>5.维护提示</td></tr>
-		<tr name="bu" class="lf"><td>1735</td><td>阮工频道</td><td>2020/5/19</td><td>34-43 WXR</td><td class="title"><a href="https://mp.weixin.qq.com/s/9PGjeNcstRC3eaVndDCrjw">风切变：飞行员看不见的敌人？</a></td><td>3.知识分享</td></tr>
-		<tr name="bi" class="lf"><td>1736</td><td>阮工频道</td><td>2020/5/21</td><td>30-00 防冰防雨</td><td class="title"><a href="https://mp.weixin.qq.com/s/yZsdOEJc8vOOvuqygNbelw">737NG关于电源转换时风挡雨刷偶尔会自己动一下的说明</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lf"><td>1737</td><td>阮工频道</td><td>2020/5/21</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/66drqIu6m7P7RKDA4xsHSg">分享一个A320驾驶舱学习小软件：BY PILOTS FOR PILOTS</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lg"><td>1738</td><td>阮工频道</td><td>2020/5/22</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/G1sGcSCbWw9YTGs0D_-P9Q">回答下前面关于MEL的问题</a></td><td>4.MEL&放行</td></tr>
-		<tr name="ag" class="lf"><td>1739</td><td>阮工频道</td><td>2020/5/25</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/TV8EXicaxnl4Dndp1kdN-g">A320起落架放下锁定指示</a></td><td>3.知识分享</td></tr>
-		<tr name="bg" class="lf"><td>1740</td><td>阮工频道</td><td>2020/5/26</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/NzvAOj4jSGmYsp1Jghg0BQ">燃油泵工作所需最低燃油量</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lf"><td>1741</td><td>阮工频道</td><td>2020/5/27</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/mf2csqaKN-N6sJEZ41ZU8A">A320大迎角保护</a></td><td>3.知识分享</td></tr>
-		<tr name="bg" class="lg"><td>1742</td><td>阮工频道</td><td>2020/5/28</td><td>28-00 燃油</td><td class="title"><a href="https://mp.weixin.qq.com/s/RczZLu1r-IgwlbpHaOhWzw">关于MEL 26-19-04货舱灭火瓶DISCH灯的保留</a></td><td>4.MEL&放行</td></tr>
-		<tr name="ag" class="lf"><td>1743</td><td>阮工频道</td><td>2020/5/29</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/2KVtbmK8bC8igeXNAb1YfQ">双侧杆输入</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lj"><td>1744</td><td>阮工频道</td><td>2020/5/30</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/sQz5yNHGeXuD52pwBd57hw">视频：A320 IDG勤务</a></td><td>7.视频资料</td></tr>
-		<tr name="ax" class="lf"><td>1745</td><td>阮工频道</td><td>2020/5/31</td><td>27-00 飞行控制</td><td class="title"><a href="https://mp.weixin.qq.com/s/StNRD_ILGQP6Sxo8OUU2XQ">737NG 方向舵为什么和A320的不一样？</a></td><td>3.知识分享</td></tr>
-		<tr name="cj" class="lf"><td>1746</td><td>阮工频道</td><td>2020/6/2</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/QKM9zMZIGM8ZfamFiOTgtw">川航空中风挡爆裂事故原因公布</a></td><td>3.知识分享</td></tr>
-		<tr name="ap" class="lf"><td>1747</td><td>阮工频道</td><td>2020/6/3</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/TzFefVPmczJTNhGxqrAX9w">基础知识 | 如何查找标准件的互换性？</a></td><td>3.知识分享</td></tr>
-		<tr name="au" class="lh"><td>1748</td><td>阮工频道</td><td>2020/6/4</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/_RuJSk0XTa2ytg3tMdqE_g">操作提示 | 驾驶舱活动窗夹住排水管导致漏气啸叫</a></td><td>5.维护提示</td></tr>
-		<tr name="as" class="la"><td>1749</td><td>阮工频道</td><td>2020/6/7</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/AW3d9D_t5CUNdhHfJ4SDMQ">案例分享 | 卫星天线和低噪放大器电源未接地导致的卫星通讯故障</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="lf"><td>1750</td><td>阮工频道</td><td>2020/6/8</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/Xy8R-DHQee2J88B74d0t_Q">关于737NG主起落架上空地传感器目标块的朝向</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lf"><td>1751</td><td>阮工频道</td><td>2020/6/10</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/r7iOCNc27OwGlKXHazssHg">为什么液压系统压力油滤检查要用「牙医镜」</a></td><td>3.知识分享</td></tr>
-		<tr name="cj" class="li"><td>1752</td><td>阮工频道</td><td>2020/6/11</td><td>56-00 窗</td><td class="title"><a href="https://mp.weixin.qq.com/s/J9EDkvJ-Mk_FB03bTAfalQ">资料分享 | 驾驶舱风挡检查培训教材</a></td><td>6.总结教程</td></tr>
-		<tr name="cb" class="la"><td>1753</td><td>阮工频道</td><td>2020/6/12</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/55V72X7nZzXK6Em-lzVLiQ">非APU引气问题导致的发动机起动慢引气压力低</a></td><td>1.1故障分享</td></tr>
-		<tr name="ar" class="la"><td>1754</td><td>阮工频道</td><td>2020/6/14</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/MLeed7kD_eFCDT8gprc6sQ">维护提示 | RA信号问题导致飞行指引消失和A/P脱开</a></td><td>1.1故障分享</td></tr>
-		<tr name="av" class="la"><td>1755</td><td>阮工频道</td><td>2020/6/19</td><td>26-00 防火</td><td class="title"><a href="https://mp.weixin.qq.com/s/r_-Lxnr7lI-MG4vTg9jtMA">案例分享 | 737NG发动机火警探测环路故障</a></td><td>1.1故障分享</td></tr>
-		<tr name="bc" class="lb"><td>1756</td><td>阮工频道</td><td>2020/6/20</td><td>27-41 水平安定面</td><td class="title"><a href="https://mp.weixin.qq.com/s/sqRp8UtMJOnT3Z_Z-_h-BA">关于737NG安定面配平指示牌刻度误差</a></td><td>1.2故障处置</td></tr>
-		<tr name="aq" class="lf"><td>1757</td><td>阮工频道</td><td>2020/6/22</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/rBWbrL385dO_8tX4cp85Dw">关于ACMS报文中空调组件的监控</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lf"><td>1758</td><td>阮工频道</td><td>2020/6/23</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/cGwyAEE1BdRSt6jyznqTnA">推荐一个APP：AIRCRAFT STATUS</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lf"><td>1759</td><td>阮工频道</td><td>2020/6/25</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/bdsVp9yEfA_1uOJPE3GT7g">推荐一个能看A320手册的网站&APP</a></td><td>3.知识分享</td></tr>
-		<tr name="ax" class="lf"><td>1760</td><td>阮工频道</td><td>2020/6/27</td><td>27-00 飞行控制</td><td class="title"><a href="https://mp.weixin.qq.com/s/DuUKRd4RydM-hR1Y_4QzZg">副翼控制钢索装反导致E190出现严重的飞行操纵问题</a></td><td>3.知识分享</td></tr>
-		<tr name="au" class="lf"><td>1761</td><td>阮工频道</td><td>2020/6/28</td><td>25-00 客舱驾驶舱设备</td><td class="title"><a href="https://mp.weixin.qq.com/s/TRnydZ412rslHg5JSQZy5g">关于737NG客舱门上滑梯的压力指示</a></td><td>3.知识分享</td></tr>
-		<tr name="bh" class="lf"><td>1762</td><td>阮工频道</td><td>2020/6/29</td><td>29-00 液压</td><td class="title"><a href="https://mp.weixin.qq.com/s/yOO6VKFQy01Obun7neKScQ">液压A系统失效都有哪些影响和风险？</a></td><td>3.知识分享</td></tr>
-		<tr name="am" class="lb"><td>1763</td><td>阮工频道</td><td>2020/7/1</td><td>05-51-19 雷击</td><td class="title"><a href="https://mp.weixin.qq.com/s/Ad3YjOf71eWvLOfcb8mleQ">机身雷击后在允许损伤下的飞行限制</a></td><td>1.2故障处置</td></tr>
-		<tr name="bp" class="la"><td>1764</td><td>阮工频道</td><td>2020/7/2</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/LEN9nk9OEwY0H6Jqix1bug">案例分享 | TAT信号无效导致ND上TAS---显示消失</a></td><td>1.1故障分享</td></tr>
-		<tr name="bl" class="lf"><td>1765</td><td>阮工频道</td><td>2020/7/4</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/76DiX-C3Tnoku2HA-F-2eQ">如何快速分辨碳刹车还是钢刹车？</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="lf"><td>1766</td><td>阮工频道</td><td>2020/7/5</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/DZy8avsPoAwhkXhvmSJjFw">管路接头孔上的这个金属丝有什么用，脱出来了怎么办？</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lj"><td>1767</td><td>阮工频道</td><td>2020/7/5</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/wLy1D_I7ILpELfP2qbrqDg">A320 CBT @09 EIS正常操作</a></td><td>7.视频资料</td></tr>
-		<tr name="ab" class="li"><td>1768</td><td>阮工频道</td><td>2020/7/6</td><td>B.Boeing网站</td><td class="title"><a href="https://mp.weixin.qq.com/s/jrAWkE4VPsUn0Nw86Kb1Rw">如何查找电气设备和线路的分布图？</a></td><td>6.总结教程</td></tr>
-		<tr name="ag" class="lj"><td>1769</td><td>阮工频道</td><td>2020/7/6</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/1Ngw9FbwPwd27Kko49-JNQ">A320 CBT @10 EIS 非正常工作</a></td><td>7.视频资料</td></tr>
-		<tr name="ar" class="lf"><td>1770</td><td>阮工频道</td><td>2020/7/8</td><td>22-00 自动飞行</td><td class="title"><a href="https://mp.weixin.qq.com/s/5dldalWT_MC2d8ymM71yaA">关于DFCS BITE TEST里的HEADING REFERENCE开关</a></td><td>3.知识分享</td></tr>
-		<tr name="cb" class="la"><td>1771</td><td>阮工频道</td><td>2020/7/11</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/vGUFpnfx5nP1bPknKXzCwA">5级引气单向活门卡阻导致发动机空停</a></td><td>1.1故障分享</td></tr>
-		<tr name="bz" class="la"><td>1772</td><td>阮工频道</td><td>2020/7/13</td><td>34-61 FMCS</td><td class="title"><a href="https://mp.weixin.qq.com/s/VYMpBiw2o3tMoVtea3j5cQ">左右FMC的F-F FACTOR 不一致导致ND出现MAP故障旗</a></td><td>1.1故障分享</td></tr>
-		<tr name="cl" class="la"><td>1773</td><td>阮工频道</td><td>2020/7/14</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/dlrX_85jbd3-7FNBtmv-Lg">737NG推油门杆后中央操纵台下异响</a></td><td>1.1故障分享</td></tr>
-		<tr name="ag" class="lj"><td>1774</td><td>阮工频道</td><td>2020/7/14</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/ZpLJ_k9SY6bhcY0hHuisbw">A320 CBT @11 气源系统介绍</a></td><td>7.视频资料</td></tr>
-		<tr name="ca" class="lh"><td>1775</td><td>阮工频道</td><td>2020/7/18</td><td>35-00 氧气</td><td class="title"><a href="https://mp.weixin.qq.com/s/-Z2BKoDUn5kKjCxwg-9mGw">维护提示 | 机组氧气面罩储藏盒测试开关断裂</a></td><td>5.维护提示</td></tr>
-		<tr name="ab" class="li"><td>1776</td><td>阮工频道</td><td>2020/7/20</td><td>B.Boeing网站</td><td class="title"><a href="https://mp.weixin.qq.com/s/ic29njqr_DdMt3uyRlRF1A">波音3D工程图，你值得拥有！</a></td><td>6.总结教程</td></tr>
-		<tr name="am" class="lh"><td>1777</td><td>阮工频道</td><td>2020/7/21</td><td>05-51-19 雷击</td><td class="title"><a href="https://mp.weixin.qq.com/s/rU1PVGZakzNhX38_nJEyxw">维护提示 | 737NG雷击后需要测试ELT和HF</a></td><td>5.维护提示</td></tr>
-		<tr name="aq" class="lh"><td>1778</td><td>阮工频道</td><td>2020/7/23</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/x1eEyDh6svdEVI5cM_w5kA">维护提示 | 737NG座舱升降率表指示来回摆动</a></td><td>5.维护提示</td></tr>
-		<tr name="ag" class="lj"><td>1779</td><td>阮工频道</td><td>2020/7/23</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/wR1pLMvdYuoJgaQCkAokxg">A320 CBT @12 气源系统正常操作</a></td><td>7.视频资料</td></tr>
-		<tr name="cb" class="lf"><td>1780</td><td>阮工频道</td><td>2020/7/24</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/itWO7FEgGTi_By-vvgjIGA">FAA发布737发动机5级引气单向活门检查紧急AD</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lj"><td>1781</td><td>阮工频道</td><td>2020/7/25</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/wnjYBlwvS46PNOKRBTmmpw">A320 CBT @13 气源系统不正常操作</a></td><td>7.视频资料</td></tr>
-		<tr name="cl" class="lf"><td>1782</td><td>阮工频道</td><td>2020/7/26</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/xSMUniujFsTg4HMr-Dj_Dg">前推油门杆会听到“嗒”的一下是什么声音？</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="la"><td>1783</td><td>阮工频道</td><td>2020/7/27</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/h0N0eeR_R1d7U2bJw7poxg">关于地面客舱空调出风口冒出白雾的说明</a></td><td>1.1故障分享</td></tr>
-		<tr name="ag" class="lj"><td>1784</td><td>阮工频道</td><td>2020/7/27</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/9sMTEFO3twTm1nXnaz0-Wg">A320 CBT @14 空调系统介绍</a></td><td>7.视频资料</td></tr>
-		<tr name="bt" class="lf"><td>1785</td><td>阮工频道</td><td>2020/7/28</td><td>34-33 LRRA</td><td class="title"><a href="https://mp.weixin.qq.com/s/NU0JZDdvN_366sCH_MqfhA">无线电高度表地面显示-4是怎样实现的？</a></td><td>3.知识分享</td></tr>
-		<tr name="ag" class="lj"><td>1786</td><td>阮工频道</td><td>2020/7/28</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/8f3bs-uudiDZFSMR2pIrgg">A320 CBT @15 空调系统正常操作</a></td><td>7.视频资料</td></tr>
-		<tr name="bl" class="lc"><td>1787</td><td>阮工频道</td><td>2020/7/31</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/pofaK7sdX-1FvLDNVCkAQw">关于刹车钢索张力低导致储压器压力下降快的故障调查</a></td><td>1.3故障分析</td></tr>
-		<tr name="cb" class="lf"><td>1788</td><td>阮工频道</td><td>2020/8/1</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/9fQx_AbaR6I_Cvb3Sg7Aig">关于737NG 发动机5级引气活门安装程序的说明</a></td><td>3.知识分享</td></tr>
-		<tr name="aq" class="la"><td>1789</td><td>阮工频道</td><td>2020/8/3</td><td>21-00 空调</td><td class="title"><a href="https://mp.weixin.qq.com/s/r48cQpV3Y3miT0kz9OOWcA">管路松动漏气导致驾驶舱空调热/风量小/结冰堵塞</a></td><td>1.1故障分享</td></tr>
-		<tr name="bs" class="la"><td>1790</td><td>阮工频道</td><td>2020/8/20</td><td>34-31 ILS</td><td class="title"><a href="https://mp.weixin.qq.com/s/nZh_VTUMjDAYKfSh6ZahGg">737NG导航控制面板故障</a></td><td>1.1故障分享</td></tr>
-		<tr name="as" class="lg"><td>1791</td><td>阮工频道</td><td>2020/8/29</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/rAf4oiJ9YUVFL93LH2gRFA">关于甚高频导航控制面板失效后的保留</a></td><td>4.MEL&放行</td></tr>
-		<tr name="bn" class="lh"><td>1792</td><td>阮工频道</td><td>2020/8/31</td><td>33-43 位置灯</td><td class="title"><a href="https://mp.weixin.qq.com/s/5L09DFZkK9_ycL0Vql18tA">737NG飞机小翼位置灯维护提示</a></td><td>5.维护提示</td></tr>
-		<tr name="cl" class="lm"><td>1793</td><td>阮工频道</td><td>2020/9/2</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/kYFPxhYvgLOKV9NxZpZUHw">737NG 发动机VCD封严放行标准</a></td><td>8.3标准查询</td></tr>
-		<tr name="cc" class="lg"><td>1794</td><td>阮工频道</td><td>2020/9/4</td><td>38-00 清水污水</td><td class="title"><a href="https://mp.weixin.qq.com/s/bhfw1GGq9rx-dVmgREQYhw">维护提示 | MEL38-02-01真空泵不工作的保留</a></td><td>4.MEL&放行</td></tr>
-		<tr name="cl" class="ld"><td>1795</td><td>阮工频道</td><td>2020/9/10</td><td>72-00 发动机</td><td class="title"><a href="https://mp.weixin.qq.com/s/b5WV_q2pihD5I0_cfW6fHg">737NG发动机磁堵检查要点</a></td><td>1.4经验总结</td></tr>
-		<tr name="bl" class="lh"><td>1796</td><td>阮工频道</td><td>2020/9/12</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/Pgvp7ptAFC9zBIF_cuJ1QQ">维护提示 | 停留刹车电门（S100）更换</a></td><td>5.维护提示</td></tr>
-		<tr name="ap" class="li"><td>1797</td><td>阮工频道</td><td>2020/9/13</td><td>20-00 标准施工</td><td class="title"><a href="https://mp.weixin.qq.com/s/UZAGBvgcEmAcadS1h6JIIA">波音液压管路施工培训</a></td><td>6.总结教程</td></tr>
-		<tr name="ab" class="li"><td>1798</td><td>阮工频道</td><td>2020/9/14</td><td>B.Boeing网站</td><td class="title"><a href="https://mp.weixin.qq.com/s/tT9JNyXRaV8R47vywU6CfQ">案例分享|使用波音工程图纸查询件号</a></td><td>6.总结教程</td></tr>
-		<tr name="cb" class="li"><td>1799</td><td>阮工频道</td><td>2020/9/14</td><td>36-00 引气</td><td class="title"><a href="https://mp.weixin.qq.com/s/gRm_PnqJxNCDr4XCzzwkTA">B737NG飞机引气系统介绍及排故课件</a></td><td>6.总结教程</td></tr>
-		<tr name="bl" class="lf"><td>1800</td><td>阮工频道</td><td>2020/9/15</td><td>32-00 起落架</td><td class="title"><a href="https://mp.weixin.qq.com/s/bqe7TKImjsD0Ck5G7a2t6w">对之前两处手册的理解补充一下厂家回复</a></td><td>3.知识分享</td></tr>
-		<tr name="as" class="lf"><td>1801</td><td>阮工频道</td><td>2020/9/16</td><td>23-00 通讯</td><td class="title"><a href="https://mp.weixin.qq.com/s/ewKt2AUgS-GgeiSoCCiwXA">关于CVR的互换性</a></td><td>3.知识分享</td></tr>
-		<tr name="ax" class="lf"><td>1802</td><td>阮工频道</td><td>2020/9/18</td><td>27-00 飞行控制</td><td class="title"><a href="https://mp.weixin.qq.com/s/1DAO2kCswzUMoaugJiBTHQ">关注着陆拉平</a></td><td>3.知识分享</td></tr>
-		<tr name="ai" class="lj"><td>1803</td><td>阮工频道</td><td>2020/9/21</td><td>00-00 概述 手册</td><td class="title"><a href="https://mp.weixin.qq.com/s/7LP6MKBaOkiETCo935L3_Q">波音训练系列-飞机着陆后的低头</a></td><td>7.视频资料</td></tr>
-		<tr name="ab" class="li"><td>1804</td><td>阮工频道</td><td>2020/9/23</td><td>B.Boeing网站</td><td class="title"><a href="https://mp.weixin.qq.com/s/gx_GSKTy2pLZE_cg783R2A">波音网发SR操作简介</a></td><td>6.总结教程</td></tr>
-		<tr name="ca" class="lh"><td>1805</td><td>阮工频道</td><td>2020/9/24</td><td>35-00 氧气</td><td class="title"><a href="https://mp.weixin.qq.com/s/QXhqNEMEdqfFSNQqoVyQ-A">维护提示 | 误扳动人工放氧气面罩开关导致整机氧气面罩放下</a></td><td>5.维护提示</td></tr>
-		<tr name="ag" class="lj"><td>1806</td><td>阮工频道</td><td>2020/9/25</td><td>G.320等空客飞机</td><td class="title"><a href="https://mp.weixin.qq.com/s/o9jEiYHYf4sg6Fz7X9j2Ng">A320 CBT @16 空调系统运行异常</a></td><td>7.视频资料</td></tr>
-		<tr name="bp" class="lm"><td>1807</td><td>阮工频道</td><td>2020/9/27</td><td>34-21 ADIRS</td><td class="title"><a href="https://mp.weixin.qq.com/s/eAsvNsQOIKiqJfOcZS3xHw">737NG静
