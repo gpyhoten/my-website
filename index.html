@@ -229,7 +229,7 @@
         setCookie("historyVisit0",historyVisit[0],30);
 
         //记录scrollbar位置
-        if(jiZhuFlag){
+        if(document.getElementById("checkBoxjiZhu").checked){
         	var biaogezhutiScrollPos = document.getElementById("biaogezhuti").scrollTop;
         	setCookie("biaogezhutiScrollPos",biaogezhutiScrollPos,30);
         }
@@ -362,6 +362,7 @@
 	        clickme();
 	        //滚动到之前位置
 			var biaogezhutiScrollPos = Number(getCookie("biaogezhutiScrollPos"));
+			console.log("biaogezhutiScrollPos"+biaogezhutiScrollPos);
 	        document.getElementById("biaogezhuti").scrollTop = biaogezhutiScrollPos;
 	    }
 	}
