@@ -5,6 +5,12 @@
   <title>机坪那些事</title>
 
   <style type="text/css">
+  	.tipHands{
+  		color: red;
+      	font-size: 50px;
+  		margin-left: 5px;
+  	}
+
     .table-area-head
     {
       background-color:#33CCFF;
@@ -82,10 +88,16 @@
 
   <script type="text/javascript">
   	var historyVisit=[-1,-1,-1];
-  	var historyVisitIndex = 0;
+  	var historyVisitTemp=[1,1,1];
     var counter = 0;
     var leibie = ["aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am","an","ao","ap","aq","ar","as","at","au","av","aw","ax","ay","az","ba","bb","bc","bd","be","bf","bg","bh","bi","bj","bk","bl","bm","bn","bo","bp","bq","br","bs","bt","bu","bv","bw","bx","by","bz","ca","cb","cc","cd","ce","cf","cg","ch","ci","cj","ck","cl","cm"];
     var myCatCode = ["la","lb","lc","ld","le","lf","lg","lh","li","lj","lk","ll","lm"];
+
+    var handNode = [document.createElement("span"),document.createElement("span"),document.createElement("span")];
+    for (var i=0;i<3;i++) {
+    	handNode[i].innerText = " ☜☜☜";
+    	handNode[i].className = "tipHands";
+    }
 
     function clickme(){
 
@@ -183,11 +195,7 @@
 
     function doclick() {
 
-        var thisRowNumber = event.srcElement.parentElement.rowIndex; // 通过event.srcElement 获取激活事件的对象 td 
-        //var thisRowNumber = event.srcElement.parentElement.parentElement.rowIndex; // 通过event.srcElement 获取激活事件的对象 td 
-
-        //alert("thisRowNumber: " + (thisRowNumber));
-
+        var thisRowNumber = event.srcElement.parentElement.parentElement.rowIndex; // 通过event.srcElement 获取激活事件的对象 td 
 
         //判断是否为最近访问，若是则跳过
         for(i=0;i<3;i++){
@@ -196,41 +204,23 @@
         	}
         }
 
-        //标记
-		var newNode = document.createTextNode(" ☜☜☜");
-		//newNode.font-style.color = #ff8040;
-
-        event.srcElement.parentElement.appendChild(newNode);
+        //移位 & 插入新节点（老节点会自动消失）
         historyVisit[2]=historyVisit[1];
+        if(historyVisit[2]>-1){
+        	document.getElementById("mytable").rows[historyVisit[2]].cells[4].appendChild(handNode[2]);
+        }
         historyVisit[1]=historyVisit[0];
+        if(historyVisit[1]>-1){
+        	document.getElementById("mytable").rows[historyVisit[1]].cells[4].appendChild(handNode[1]);
+        }
         historyVisit[0]=thisRowNumber;
-
-/*
-            var board = document.getElementById("board");
-            var e = document.createElement("input");
-            e.type = "button";
-            e.value = "这是测试加载的小例子";
-            var object = board.appendChild(e);
-*/
-
-	  	//var historyVisit[-1,-1,-1];
-	  	//var historyVisitIndex = 0;
-
-
-
-
-/*
-        var td = event.srcElement; // 通过event.srcElement 获取激活事件的对象 td 
-
-        alert("行号：" + (td.parentElement.rowIndex + 1) + "，内容：" + td.innerText);
-        var tab = document.getElementById("mytable");
-        //表格行数
-        var rows = tab.rows.length;
-        //表格列数
-        var cells = tab.rows.item(0).cells.length;
-        alert("行数" + rows + "列数" + cells);
-*/
-
+        if(historyVisit[0]>-1){
+        	document.getElementById("mytable").rows[historyVisit[0]].cells[4].appendChild(handNode[0]);
+        }
+        //放入cookie
+        setCookie("historyVisit2",historyVisit[2],30);
+        setCookie("historyVisit1",historyVisit[1],30);
+        setCookie("historyVisit0",historyVisit[0],30);
     }
     //限制输入空格
     function limateTpye(){
@@ -308,16 +298,36 @@
     		myAnchors[i].onclick = doclick;
     	}
 
-    	console.log(myAnchors);
 
+	    var myCookies = " ataIndex:"+getCookie("ataIndex") +" myCATFlag:"+ getCookie("myCATFlag") +" searchKeyWord:"+ getCookie("searchKeyWord") +" historyVisit2:"+getCookie("historyVisit2") +" historyVisit1:"+getCookie("historyVisit1") +" historyVisit0:"+getCookie("historyVisit0");
+	    console.log(myCookies);
 
+	    //读取historyVisit
+	    historyVisitTemp[0]=Number(getCookie("historyVisit0"));
+	    console.log(historyVisitTemp[0]);
+	    historyVisitTemp[1]=Number(getCookie("historyVisit1"));
+	    console.log(historyVisitTemp[1]);
+	    historyVisitTemp[2]=Number(getCookie("historyVisit2"));
+	    console.log(historyVisitTemp[2]);
 
+		//加入手形状提示
+		console.log("historyVisit[0]"+historyVisit[0])
+	    if(historyVisitTemp[0]!=null && historyVisitTemp[0]!="" && historyVisitTemp[0]>-1){
+	    	historyVisit[0]=historyVisitTemp[0];
+        	document.getElementById("mytable").rows[historyVisit[0]].cells[4].appendChild(handNode[0]);
+	    }
+		console.log("historyVisit[1]"+historyVisit[1])
+	    if(historyVisitTemp[1]!=null && historyVisitTemp[1]!="" && historyVisitTemp[1]>-1){
+	    	historyVisit[1]=historyVisitTemp[1];
+        	document.getElementById("mytable").rows[historyVisit[1]].cells[4].appendChild(handNode[1]);
+        }
+		console.log("historyVisit[2]"+historyVisit[2])
+	    if(historyVisitTemp[2]!=null && historyVisitTemp[2]!="" && historyVisitTemp[2]>-1){
+	    	historyVisit[2]=historyVisitTemp[2];
+        	document.getElementById("mytable").rows[historyVisit[2]].cells[4].appendChild(handNode[2]);
+	    }
 
-	        var myCookies = getCookie("ataIndex") + getCookie("myCATFlag") + getCookie("searchKeyWord") ;
-	        console.log("当前的cookie:");
-	        console.log(document.cookie);
-
-
+	    //读取ATA
     	var jiZhuFlag = getCookie("jiZhuFlag");
         if(jiZhuFlag== "true"){
     		document.getElementById("checkBoxjiZhu").checked = true;
@@ -337,8 +347,10 @@
 	        justSetCookieFlag = true;
 	        clickme();
 	    }
+	}
 
-	} 
+
+
 
   </script>
 </head>
