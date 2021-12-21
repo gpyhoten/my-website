@@ -124,9 +124,9 @@
         tableTr[i].style.display = "none";
         }
 
-        document.getElementById("myATA").style.backgroundColor = (x==0?"#ffffff":"#33ccff");
+        document.getElementById("myATA").style.backgroundColor = (x==0?"#eeeeee":"#33ccff");
         console.log("myCATStr"+myCATStr);
-        document.getElementById("myCAT").style.backgroundColor = (myCATStr==""?"#ffffff":"#33ccff");
+        document.getElementById("myCAT").style.backgroundColor = (myCATStr==""?"#eeeeee":"#33ccff");
         document.getElementById("titleSearch").style.backgroundColor = (document.getElementById("titleSearch").value==""?"#eeeeee":"#33ccff");
         
 
@@ -176,7 +176,7 @@
         var jiZhuFlag = document.getElementById("checkBoxjiZhu").checked;
         var myCATFlag = "";
         
-        document.getElementById("checkBoxLabel").style.backgroundColor = (jiZhuFlag==true?"#33CCFF":"#FFFFFF");
+        document.getElementById("checkBoxLabel").style.backgroundColor = (jiZhuFlag==true?"#33CCFF":"#eeeeee");
 
         for(i=0;i<myCAToptions.length;i++){
           if(myCAToptions[i].selected == true){
@@ -212,7 +212,8 @@
     function doclick() {
 
         var thisRowNumber = event.srcElement.parentElement.parentElement.rowIndex; // 通过event.srcElement 获取激活事件的对象 td 
-
+        //在新窗口中打开
+        event.srcElement.target="_blank" ;
         //判断是否为最近访问，若是则跳过
         for(i=0;i<3;i++){
         	if(historyVisit[i]==thisRowNumber){
@@ -312,7 +313,14 @@
     		document.getElementById("myCAT").style.height = "10vh";
     		document.getElementById("titleSearch").style.height = "10vh";
     		document.getElementById("confirmBtn").style.height = "10vh";
+    		document.getElementById("checkBoxLabel").style.height = "10vh";
     		document.getElementById("biaogezhuti").style.height = "85vh";
+
+    		document.getElementById("myATA").style.fontSize = "1vw";
+    		document.getElementById("myCAT").style.fontSize = "1vw";
+    		document.getElementById("titleSearch").style.fontSize = "1vw";
+    		document.getElementById("confirmBtn").style.fontSize = "1vw";
+    		document.getElementById("checkBoxLabel").style.fontSize = "1vw";
     	}
 
     	//给超链接绑定事件
