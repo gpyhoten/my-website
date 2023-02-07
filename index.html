@@ -100,12 +100,11 @@
     	handNode[i].className = "tipHands";
     }
 
+    //执行筛选
     function clickme(){
-
-
         var x=document.getElementById("myATA").selectedIndex;
         var y=document.getElementById("myATA").options;
-        var searchKeyWord = document.getElementById("titleSearch").value;
+        var searchKeyWord = document.getElementById("titleSearch").value.toUpperCase();
         var tableTr = document.getElementById("mytable").rows;
         var selectedATATr = document.getElementsByName(myATA.value);  
 
@@ -209,8 +208,8 @@
 	        console.log(document.cookie);
     }
 
+    //点击链接
     function doclick() {
-
         var thisRowNumber = event.srcElement.parentElement.parentElement.rowIndex; // 通过event.srcElement 获取激活事件的对象 td 
         //在新窗口中打开
         event.srcElement.target="_blank" ;
@@ -247,7 +246,7 @@
     }
     //限制输入空格
     function limateTpye(){
-      var Oldstr = document.getElementById("titleSearch").value.replace(" ","").toUpperCase();
+      var Oldstr = document.getElementById("titleSearch").value.replace(" ","");
       document.getElementById("titleSearch").value = Oldstr;
 	/*
       if(Oldstr != null && Oldstr!=""){
@@ -3409,7 +3408,7 @@
 
 
       </table>
-      <div id=updatedTime>更新日期：2021年11月15日</div>
+      <div id=updatedTime></div>
   </div>
 </div>
 
